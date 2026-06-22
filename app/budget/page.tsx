@@ -1,6 +1,30 @@
 export const revalidate = 86400;
 
 import { getBudgetYears } from "@/lib/queries";
+import type { BudgetYear } from "@/lib/types";
+
+function surplusColorClass(surplus: number, income: number): string {
+  if (income === 0) return "text-muted-foreground";
+  if (surplus < 0) return "text-red-600";
+  const pct = surplus / income;
+  if (pct > 0.3) return "text-amber-600";
+  return "text-green-700";
+}
+
+function yoyIndicator(current: number, prev: BudgetYear | undefined, field: "income" | "expenditure"): string {
+  if (!prev) return "";
+  const diff = current - prev[field];
+  if (diff > 0) return " ↑";
+  if (diff < 0) return " ↓";
+  return "";
+}
+
+function yoyColorClass(current: number, prev: BudgetYear | undefined, field: "income" | "expenditure"): string {
+  if (!prev) return "";
+  const diff = current - prev[field];
+  if (field === "income") return diff > 0 ? "text-green-600" : diff < 0 ? "text-red-600" : "";
+  return diff > 0 ? "text-red-600" : diff < 0 ? "text-green-600" : "";
+}
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -70,16 +94,32 @@ export default async function BudgetPage() {
             </tr>
           </thead>
           <tbody>
-            {[...budgetData].reverse().map((row, i) => (
-              <tr key={row.year} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-medium">{row.year}</td>
-                <td className="px-4 py-3">{formatPeso(row.income)}</td>
-                <td className="px-4 py-3">{formatPeso(row.expenditure)}</td>
-                <td className="px-4 py-3 text-green-700">{formatPeso(row.income - row.expenditure)}</td>
-                <td className="px-4 py-3">{formatPeso(row.drrf)}</td>
-                <td className="px-4 py-3">{formatPeso(row.sef)}</td>
-              </tr>
-            ))}
+            {[...budgetData].reverse().map((row, i, arr) => {
+              const prev = arr[i + 1];
+              const surplus = row.income - row.expenditure;
+              return (
+                <tr key={row.year} className="border-t hover:bg-muted/50 transition-colors">
+                  <td className="px-4 py-3 font-medium">{row.year}</td>
+                  <td className="px-4 py-3">
+                    {formatPeso(row.income)}
+                    <span className={`text-xs ml-1 ${yoyColorClass(row.income, prev, "income")}`}>
+                      {yoyIndicator(row.income, prev, "income")}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    {formatPeso(row.expenditure)}
+                    <span className={`text-xs ml-1 ${yoyColorClass(row.expenditure, prev, "expenditure")}`}>
+                      {yoyIndicator(row.expenditure, prev, "expenditure")}
+                    </span>
+                  </td>
+                  <td className={`px-4 py-3 font-medium ${surplusColorClass(surplus, row.income)}`}>
+                    {formatPeso(surplus)}
+                  </td>
+                  <td className="px-4 py-3">{formatPeso(row.drrf)}</td>
+                  <td className="px-4 py-3">{formatPeso(row.sef)}</td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>

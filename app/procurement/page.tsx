@@ -3,21 +3,7 @@ export const revalidate = 3600;
 import { getContracts } from "@/lib/queries";
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const STATUS_COLORS: Record<string, string> = {
-  Active: "bg-green-100 text-green-800",
-  Completed: "bg-blue-100 text-blue-800",
-  Cancelled: "bg-red-100 text-red-800",
-};
-
-const CATEGORY_COLORS: Record<string, string> = {
-  "Flood Control": "bg-amber-100 text-amber-800",
-  "Water & Utilities": "bg-cyan-100 text-cyan-800",
-  Roads: "bg-slate-100 text-slate-800",
-  Buildings: "bg-purple-100 text-purple-800",
-  "Street Lighting": "bg-yellow-100 text-yellow-800",
-  Health: "bg-pink-100 text-pink-800",
-};
+import { ProcurementTable } from "./procurement-table";
 
 export default async function ProcurementPage() {
   const contracts = await getContracts();
@@ -77,42 +63,7 @@ export default async function ProcurementPage() {
         </Card>
       </div>
 
-      <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
-          <thead className="bg-muted">
-            <tr>
-              {["Contract ID", "Title", "Awardee", "Category", "Amount", "Date", "Status"].map((h) => (
-                <th key={h} className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">
-                  {h}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {contracts.map((c, i) => (
-              <tr key={c.id} className={i % 2 === 0 ? "bg-background" : "bg-muted/30"}>
-                <td className="px-4 py-3 font-mono text-xs text-muted-foreground">{c.id}</td>
-                <td className="px-4 py-3 max-w-xs">
-                  <p className="font-medium leading-snug">{c.title}</p>
-                </td>
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.awardee}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
-                    {c.category}
-                  </span>
-                </td>
-                <td className="px-4 py-3 font-semibold whitespace-nowrap">{formatPeso(c.amount)}</td>
-                <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.date}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[c.status]}`}>
-                    {c.status}
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <ProcurementTable contracts={contracts} />
       <p className="text-xs text-muted-foreground mt-3">
         Source: PhilGEPS contract awards. Run{" "}
         <code className="bg-muted px-1 rounded">npx tsx scripts/scrape-philgeps.ts</code> to refresh live data.

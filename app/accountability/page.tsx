@@ -4,6 +4,7 @@ import { getBudgetYears, getDpwhProjects, getContracts } from "@/lib/queries";
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import type { Contract, DpwhProject } from "@/lib/types";
 
 type FindingType = "critical" | "warn" | "ok";
 
@@ -11,6 +12,8 @@ type Finding = {
   type: FindingType;
   title: string;
   detail: string;
+  relatedContracts?: Contract[];
+  relatedProjects?: DpwhProject[];
 };
 
 export default async function AccountabilityPage() {
@@ -29,16 +32,23 @@ export default async function AccountabilityPage() {
     .reduce((sum, c) => sum + c.amount, 0);
   const drrfTotal = budgetData.reduce((sum, y) => sum + y.drrf, 0);
 
+  const waterContractsList = contracts.filter((c) => c.category === "Water & Utilities");
+  const floodProjectsList = projects.filter((p) => p.category === "Flood Control");
+  // PhilGEPS reference ID for the CSJDM Sports Complex contract (awarded 2020)
+  const sportsContract = contracts.filter((c) => c.id === "20CD0147");
+
   const findings: Finding[] = [
     {
       type: "critical",
       title: "Water Crisis vs. Water Spending",
       detail: `The city awarded ${formatPeso(waterContracts)} in water & utility contracts, yet 250,000 residents (≈36% of the population) are without reliable water supply as of 2025 after PrimeWater's contract was terminated. Where did the money go?`,
+      relatedContracts: waterContractsList,
     },
     {
       type: "critical",
       title: `Flooding Persists Despite ${formatPeso(floodBudget)} in Flood Projects`,
       detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since 2020. In June 2025, 22 barangays were still inundated — floodwater rose neck-deep in 45 minutes. The evacuation center in Brgy. San Rafael I (Contract 23CD0301) was still only 50% complete when floods hit.`,
+      relatedProjects: floodProjectsList,
     },
     {
       type: "warn",
@@ -54,6 +64,7 @@ export default async function AccountabilityPage() {
       type: "ok",
       title: "Sports Complex Delivered On Time",
       detail: `The San Jose del Monte Sports Complex (Contract 20CD0147, ${formatPeso(14_106_670)}) was completed in 2021 as contracted. At least one project was delivered as promised.`,
+      relatedContracts: sportsContract.length > 0 ? sportsContract : undefined,
     },
   ];
 
@@ -109,12 +120,37 @@ export default async function AccountabilityPage() {
 
       <div className="space-y-4 mb-10">
         {findings.map((f, i) => (
-          <div key={i} className={`border rounded-lg p-5 flex gap-3 ${bgColors[f.type]}`}>
-            {icons[f.type]}
-            <div>
-              <p className={`font-semibold mb-1 ${textColors[f.type]}`}>{f.title}</p>
-              <p className={`text-sm leading-relaxed ${detailColors[f.type]}`}>{f.detail}</p>
+          <div key={i} className={`border rounded-lg p-5 ${bgColors[f.type]}`}>
+            <div className="flex gap-3">
+              {icons[f.type]}
+              <div className="flex-1">
+                <p className={`font-semibold mb-1 ${textColors[f.type]}`}>{f.title}</p>
+                <p className={`text-sm leading-relaxed ${detailColors[f.type]}`}>{f.detail}</p>
+              </div>
             </div>
+            {(f.relatedContracts || f.relatedProjects) && (
+              <details className="mt-3 ml-8">
+                <summary className={`text-xs font-medium cursor-pointer select-none hover:underline ${detailColors[f.type]}`}>
+                  Show related {f.relatedContracts ? `contracts (${f.relatedContracts.length})` : ""}
+                  {f.relatedContracts && f.relatedProjects ? " & " : ""}
+                  {f.relatedProjects ? `projects (${f.relatedProjects.length})` : ""}
+                </summary>
+                <div className="mt-2 space-y-1">
+                  {f.relatedContracts?.map((c) => (
+                    <div key={c.id} className="flex justify-between text-xs py-1 border-b border-black/10 last:border-0 gap-3">
+                      <span className={`truncate ${detailColors[f.type]}`}>{c.title}</span>
+                      <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(c.amount)}</span>
+                    </div>
+                  ))}
+                  {f.relatedProjects?.map((p) => (
+                    <div key={p.contractId} className="flex justify-between text-xs py-1 border-b border-black/10 last:border-0 gap-3">
+                      <span className={`truncate ${detailColors[f.type]}`}>{p.description}</span>
+                      <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(p.budget)}</span>
+                    </div>
+                  ))}
+                </div>
+              </details>
+            )}
           </div>
         ))}
       </div>
