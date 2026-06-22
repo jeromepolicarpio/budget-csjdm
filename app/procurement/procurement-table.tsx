@@ -188,7 +188,7 @@ export function ProcurementTable({ contracts }: Props) {
                   </td>
                   <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.awardee}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
                       {c.category}
                     </span>
                   </td>
