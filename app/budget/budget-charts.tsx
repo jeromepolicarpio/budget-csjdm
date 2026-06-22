@@ -37,8 +37,8 @@ export function BudgetCharts({ data }: { data: BudgetYear[] }) {
               <YAxis tickFormatter={(v) => `₱${v}M`} className="text-xs" />
               <Tooltip formatter={(v) => `₱${Number(v).toFixed(0)}M`} />
               <Legend />
-              <Bar dataKey="Income" fill="#2563eb" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="Expenditure" fill="#93c5fd" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Income" fill="var(--chart-1)" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="Expenditure" fill="var(--chart-2)" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>
@@ -58,7 +58,7 @@ export function BudgetCharts({ data }: { data: BudgetYear[] }) {
               <XAxis dataKey="year" className="text-xs" />
               <YAxis tickFormatter={(v) => `₱${v}M`} className="text-xs" />
               <Tooltip formatter={(v) => `₱${Number(v).toFixed(0)}M`} />
-              <Line type="monotone" dataKey="DRRF" stroke="#f59e0b" strokeWidth={2} dot={{ r: 4 }} />
+              <Line type="monotone" dataKey="DRRF" stroke="var(--chart-3)" strokeWidth={2} dot={{ r: 4 }} />
             </LineChart>
           </ResponsiveContainer>
         </div>

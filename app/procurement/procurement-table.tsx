@@ -3,6 +3,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import type { Contract } from "@/lib/types";
 import { formatPeso } from "@/lib/data";
+import { X } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -186,9 +187,10 @@ export function ProcurementTable({ contracts }: Props) {
         {hasFilters && (
           <button
             onClick={clearFilters}
-            className="ml-2 px-3 py-1 rounded-full text-xs font-medium border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+            className="ml-2 inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
           >
-            ✕ Clear
+            <X size={11} />
+            Clear
           </button>
         )}
       </div>

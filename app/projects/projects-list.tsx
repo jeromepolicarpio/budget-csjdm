@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react";
 import type { DpwhProject } from "@/lib/types";
 import { formatPeso } from "@/lib/data";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const STATUS_COLORS: Record<string, string> = {
   Completed: "bg-green-100 text-green-800",
@@ -33,13 +34,14 @@ function ProjectCard({ project: p }: { project: DpwhProject }) {
         <div className="flex-1 min-w-0">
           <button
             onClick={() => setExpanded((e) => !e)}
+            aria-expanded={expanded}
             className="text-left w-full"
           >
             <p className={`font-medium leading-snug ${expanded ? "" : "line-clamp-1"}`}>
               {p.description}
             </p>
-            <span className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-              {expanded ? "▲ show less" : "▼ show more"}
+            <span className="inline-flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground transition-colors">
+              {expanded ? <><ChevronUp size={12} /> show less</> : <><ChevronDown size={12} /> show more</>}
             </span>
           </button>
           {expanded && (
