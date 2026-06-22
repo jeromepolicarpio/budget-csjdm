@@ -18,6 +18,8 @@ const STATUS_BAR_COLORS: Record<string, string> = {
   Terminated: "bg-red-500",
 };
 
+const STATUS_ORDER = ["On-going", "Completed", "Suspended", "Terminated"];
+
 interface Props {
   projects: DpwhProject[];
 }
@@ -170,29 +172,65 @@ export function ProjectsList({ projects }: Props) {
 
   const total = projects.length || 1;
 
+  const orderedStatuses = useMemo(
+    () => STATUS_ORDER.filter((s) => statusCounts[s] !== undefined),
+    [statusCounts]
+  );
+
   return (
     <div className="space-y-4">
       <div className="rounded-lg border p-4 bg-card">
-        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-2">
-          Project Status Breakdown
-        </p>
-        <div className="flex h-4 rounded-full overflow-hidden gap-px">
-          {Object.entries(statusCounts).map(([status, count]) => (
-            <div
-              key={status}
-              className={`h-full ${STATUS_BAR_COLORS[status] ?? "bg-muted"}`}
-              style={{ width: `${(count / total) * 100}%` }}
-              title={`${status}: ${count}`}
-            />
-          ))}
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
+            Project Status Breakdown
+          </p>
+          <p className="text-xs text-muted-foreground">{projects.length} total</p>
         </div>
-        <div className="flex flex-wrap gap-4 mt-2">
-          {Object.entries(statusCounts).map(([status, count]) => (
-            <span key={status} className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <span className={`w-2.5 h-2.5 rounded-sm inline-block ${STATUS_BAR_COLORS[status] ?? "bg-muted"}`} />
-              {count} {status}
-            </span>
-          ))}
+        <div className="flex h-6 rounded-lg overflow-hidden">
+          {orderedStatuses.map((status, i) => {
+            const count = statusCounts[status]!;
+            const pct = (count / total) * 100;
+            return (
+              <button
+                key={status}
+                onClick={() => toggleStatus(status)}
+                title={`${status}: ${count} (${pct.toFixed(1)}%)`}
+                className={`h-full relative flex items-center justify-center transition-opacity hover:opacity-80 focus:outline-none ${
+                  STATUS_BAR_COLORS[status] ?? "bg-muted"
+                } ${i > 0 ? "border-l border-white/20" : ""} ${
+                  selectedStatuses.size > 0 && !selectedStatuses.has(status) ? "opacity-40" : ""
+                }`}
+                style={{ width: `${pct}%` }}
+              >
+                {pct >= 15 && (
+                  <span className="text-white text-[10px] font-semibold drop-shadow select-none">
+                    {Math.round(pct)}%
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+        <div className="flex flex-wrap gap-x-5 gap-y-1.5 mt-3">
+          {orderedStatuses.map((status) => {
+            const count = statusCounts[status]!;
+            const pct = ((count / total) * 100).toFixed(1);
+            const active = selectedStatuses.has(status);
+            return (
+              <button
+                key={status}
+                onClick={() => toggleStatus(status)}
+                className={`flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70 ${
+                  selectedStatuses.size > 0 && !active ? "opacity-40" : ""
+                }`}
+              >
+                <span className={`w-2.5 h-2.5 rounded-sm inline-block ${STATUS_BAR_COLORS[status] ?? "bg-muted"}`} />
+                <span className="font-medium text-foreground">{count}</span>
+                <span className="text-muted-foreground">{status}</span>
+                <span className="text-muted-foreground/60">({pct}%)</span>
+              </button>
+            );
+          })}
         </div>
       </div>
 
