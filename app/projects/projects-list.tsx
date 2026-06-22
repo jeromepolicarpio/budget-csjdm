@@ -7,15 +7,15 @@ import { formatPeso } from "@/lib/data";
 const STATUS_COLORS: Record<string, string> = {
   Completed: "bg-green-100 text-green-800",
   "On-going": "bg-blue-100 text-blue-800",
-  Suspended: "bg-red-100 text-red-800",
+  Suspended: "bg-amber-100 text-amber-800",
   Terminated: "bg-red-100 text-red-800",
 };
 
 const STATUS_BAR_COLORS: Record<string, string> = {
-  "On-going": "bg-blue-400",
-  Completed: "bg-green-400",
-  Suspended: "bg-red-300",
-  Terminated: "bg-red-300",
+  "On-going": "bg-blue-500",
+  Completed: "bg-emerald-500",
+  Suspended: "bg-amber-400",
+  Terminated: "bg-red-500",
 };
 
 interface Props {
