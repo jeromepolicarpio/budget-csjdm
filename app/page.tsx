@@ -2,8 +2,9 @@ export const revalidate = 3600;
 
 import { getBudgetYears, getDpwhProjects, getContracts } from "@/lib/queries";
 import { formatPeso } from "@/lib/data";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, TrendingUp, Building2, FileText, Check } from "lucide-react";
 
@@ -30,62 +31,44 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="border-b bg-gradient-to-b from-primary/5 to-background">
-        <div className="max-w-6xl mx-auto px-4 pt-14 pb-12">
+        <div className="max-w-3xl mx-auto px-4 pt-16 pb-14 flex flex-col items-center text-center">
+          <Image
+            src="/San-Jose-del-Monte-Official-Seal.png"
+            alt="City of San Jose del Monte Official Seal"
+            width={72}
+            height={72}
+            className="rounded-full mb-6"
+            priority
+          />
           <Badge variant="outline" className="mb-5 border-primary/30 text-primary bg-primary/5">
             San Jose del Monte, Bulacan · Citizen-Built · Open Data
           </Badge>
-          <h1 className="text-5xl font-bold tracking-tight mb-4 leading-tight">
-            <span className="block">City of San Jose del Monte</span>
-            <span className="block text-primary">People&apos;s Budget Portal</span>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-4 leading-tight">
+            <span className="block">City of San Jose</span>
+            <span className="block text-primary">del Monte</span>
           </h1>
-          <p className="text-muted-foreground text-lg max-w-2xl mb-10">
+          <p className="text-muted-foreground text-lg mb-12 max-w-xl">
             Track how CSJDM spends your taxes — budget, contracts, and infrastructure.
-            Powered by public data from BLGF, PhilGEPS, and DPWH. No spin. Just numbers.
+            No spin. Just numbers.
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className="border-primary/20">
-              <CardHeader className="pb-1 pt-4 px-4">
-                <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  {latest.year} City Income
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <p className="text-3xl font-bold tracking-tight">{formatPeso(latest.income)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-1 pt-4 px-4">
-                <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  {latest.year} Expenditure
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <p className="text-3xl font-bold tracking-tight">{formatPeso(latest.expenditure)}</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-1 pt-4 px-4">
-                <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  DPWH Projects
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <p className="text-3xl font-bold tracking-tight">{formatPeso(totalDpwhBudget)}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{projects.length} tracked</p>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardHeader className="pb-1 pt-4 px-4">
-                <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">
-                  Disaster Fund (DRRF)
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="px-4 pb-4">
-                <p className="text-3xl font-bold tracking-tight">{formatPeso(latest.drrf)}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{latest.year} allocation</p>
-              </CardContent>
-            </Card>
+          <div className="w-full flex flex-col sm:flex-row items-center justify-center divide-y sm:divide-y-0 sm:divide-x border rounded-xl overflow-hidden bg-background">
+            <div className="flex-1 px-6 py-5 text-center">
+              <p className="text-2xl font-bold tracking-tight">{formatPeso(latest.income)}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">{latest.year} City Income</p>
+            </div>
+            <div className="flex-1 px-6 py-5 text-center">
+              <p className="text-2xl font-bold tracking-tight">{formatPeso(latest.expenditure)}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">{latest.year} Expenditure</p>
+            </div>
+            <div className="flex-1 px-6 py-5 text-center">
+              <p className="text-2xl font-bold tracking-tight">{formatPeso(totalDpwhBudget)}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">{projects.length} DPWH Projects</p>
+            </div>
+            <div className="flex-1 px-6 py-5 text-center">
+              <p className="text-2xl font-bold tracking-tight">{formatPeso(latest.drrf)}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">Disaster Fund</p>
+            </div>
           </div>
         </div>
       </section>
