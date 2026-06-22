@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               </a>
               , BLGF, PhilGEPS, and DPWH open data.
             </p>
-            <p className="mt-1">Built by citizens, for citizens. Not affiliated with the City Government of CSJDM.</p>
+            <p className="mt-1">&ldquo;Para sa bawat San Joseño&rdquo; — Not affiliated with the City Government of CSJDM.</p>
           </div>
         </footer>
       </body>
