@@ -143,7 +143,7 @@ export function ProcurementTable({ contracts }: Props) {
             <tr>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Awardee</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Category</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap min-w-[140px]">Category</th>
               <th
                 className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap"
                 aria-sort={sortKey === "amount" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
