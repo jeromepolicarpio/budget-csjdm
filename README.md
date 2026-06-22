@@ -1,36 +1,111 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# City of San Jose del Monte — People's Budget Portal
+
+> *"Para sa bawat San Joseño"*
+
+A civic transparency tracker for **City of San Jose del Monte, Bulacan**. Follow where the money goes — annual budget, government contracts, and DPWH infrastructure projects — sourced entirely from Philippine open data portals.
+
+**Live:** [csjdm-budget.vercel.app](https://csjdm-budget.vercel.app)
+
+---
+
+## What's Inside
+
+| Page | Data Source | Updates |
+|---|---|---|
+| **Budget** | BLGF — Statement of Receipts & Expenditures | Annual (manual import) |
+| **Procurement** | PhilGEPS via BetterGov Meilisearch | Hourly (live) |
+| **Projects** | DPWH e-IPIS via BetterGov Meilisearch | Hourly (live) |
+| **Accountability** | LDRRMF & SEF from BLGF | Annual (manual import) |
+
+---
+
+## Data Sources
+
+- **[BLGF](https://blgf.gov.ph)** — Bureau of Local Government Finance. Annual LGU fiscal data: income, expenditures, SEF, and LDRRMF.
+- **[PhilGEPS](https://philgeps.gov.ph)** — Philippine Government Electronic Procurement System. All awarded contracts involving CSJDM.
+- **[DPWH](https://dpwh.gov.ph)** — Department of Public Works and Highways. Infrastructure project tracking.
+- **[BetterGov.ph](https://data.bettergov.ph)** — Open data aggregator that indexes DPWH and PhilGEPS for fast search.
+
+> Not affiliated with the City Government of San Jose del Monte.
+
+---
+
+## Tech Stack
+
+- **[Next.js 15](https://nextjs.org)** — App Router, ISR caching
+- **[Neon](https://neon.tech)** — Serverless Postgres (fallback data store)
+- **[Drizzle ORM](https://orm.drizzle.team)** — Type-safe DB queries
+- **[BetterGov Meilisearch](https://search2.bettergov.ph)** — Live DPWH & PhilGEPS search index
+- **[shadcn/ui](https://ui.shadcn.com)** — UI components
+- **[Recharts](https://recharts.org)** — Budget charts
+- **[Vercel](https://vercel.com)** — Hosting + daily cron job
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone and install
+
+```bash
+git clone https://github.com/jeromepolicarpio/csjdm-budget.git
+cd csjdm-budget
+npm install
+```
+
+### 2. Set up environment
+
+```bash
+cp .env.example .env.local
+# Fill in DATABASE_URL (Neon connection string)
+# Fill in CRON_SECRET (any random string)
+```
+
+### 3. Push the database schema
+
+```bash
+npx drizzle-kit push
+```
+
+### 4. Import BLGF fiscal data
+
+Opens a real browser window to bypass BLGF's WAF, downloads the annual Excel files, and upserts CSJDM rows into Neon.
+
+```bash
+npx tsx scripts/import-blgf.ts
+```
+
+### 5. Run locally
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Importing New BLGF Data
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+When BLGF publishes a new fiscal year (usually mid-year for the prior FY):
 
-## Learn More
+1. Find the new file URLs on [blgf.gov.ph/lgu-fiscal-data](https://blgf.gov.ph/lgu-fiscal-data/)
+2. Add the year entry to `FILE_URLS` in `scripts/import-blgf.ts`
+3. Run `npx tsx scripts/import-blgf.ts --years <YEAR>`
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Architecture
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+BetterGov Meilisearch ──→ lib/bettergov.ts ──→ lib/queries.ts ──→ Pages
+        (live, hourly)            │
+                                  └──→ Neon DB  (fallback + budget cache)
+                                                       ↑
+BLGF Excel (annual) ──→ scripts/import-blgf.ts ───────┘
+```
 
-## Deploy on Vercel
+Live data from BetterGov is always tried first. On failure, pages fall back to Neon. Budget data is always from Neon (imported from BLGF Excel files).
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## License
+
+MIT — data belongs to the public.
