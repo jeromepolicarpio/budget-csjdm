@@ -1,6 +1,19 @@
 export function categorizeTitle(title: string): string {
   const t = title.toLowerCase();
-  if (t.includes("flood") || t.includes("drainage")) return "Flood Control";
+  if (
+    t.includes("flood") ||
+    t.includes("drainage") ||
+    t.includes("canal") ||
+    t.includes("culvert") ||
+    t.includes("dike") ||
+    t.includes("revetment") ||
+    t.includes("riprap") ||
+    t.includes("desilt") ||
+    t.includes("riverbank") ||
+    t.includes("creek") ||
+    t.includes("estero")
+  )
+    return "Flood Control";
   if (t.includes("road") || t.includes("pavement") || t.includes("bridge"))
     return "Roads";
   if (t.includes("water") || t.includes("potable")) return "Water & Utilities";
