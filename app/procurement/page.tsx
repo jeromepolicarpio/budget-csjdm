@@ -10,9 +10,8 @@ export default async function ProcurementPage() {
 
   const total = contracts.reduce((sum, c) => sum + c.amount, 0);
   const active = contracts.filter((c) => c.status === "Active");
-  const floodSpend = contracts
-    .filter((c) => c.category === "Flood Control")
-    .reduce((sum, c) => sum + c.amount, 0);
+  const cancelled = contracts.filter((c) => c.status === "Cancelled");
+  const cancelledSpend = cancelled.reduce((sum, c) => sum + c.amount, 0);
   const waterSpend = contracts
     .filter((c) => c.category === "Water & Utilities")
     .reduce((sum, c) => sum + c.amount, 0);
@@ -45,11 +44,11 @@ export default async function ProcurementPage() {
         </Card>
         <Card>
           <CardHeader className="pb-1 pt-4 px-4">
-            <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Flood Control</CardTitle>
+            <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Cancelled Contracts</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{formatPeso(floodSpend)}</p>
-            <p className="text-xs text-muted-foreground">Yet flooding persists</p>
+            <p className="text-2xl font-bold">{cancelled.length}</p>
+            <p className="text-xs text-muted-foreground">{formatPeso(cancelledSpend)} voided</p>
           </CardContent>
         </Card>
         <Card>
