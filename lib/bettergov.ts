@@ -54,10 +54,11 @@ function normalizeDpwhHit(hit: Record<string, unknown>): DpwhProject {
     hit.PROJECT_DESCRIPTION ?? hit.description ?? hit.DESCRIPTION ?? ""
   );
   const rawCategory = str(hit.CATEGORY ?? hit.category ?? "");
-  const category =
+  const fromRaw =
     rawCategory && !isFundSourceLabel(rawCategory)
-      ? rawCategory
-      : categorizeTitle(description);
+      ? categorizeTitle(rawCategory)
+      : "Other";
+  const category = fromRaw !== "Other" ? fromRaw : categorizeTitle(description);
 
   return {
     contractId: str(
