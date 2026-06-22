@@ -8,6 +8,10 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 export const metadata: Metadata = {
   title: "City of San Jose del Monte | People's Budget Portal",
   description: "Budget transparency tracker for City of San Jose del Monte, Bulacan. Follow the money.",
+  icons: {
+    icon: "/San-Jose-del-Monte-Official-Seal.png",
+    apple: "/San-Jose-del-Monte-Official-Seal.png",
+  },
   openGraph: {
     title: "City of San Jose del Monte | People's Budget Portal",
     description: "Where did the money go? Track CSJDM's spending, contracts, and infrastructure projects.",

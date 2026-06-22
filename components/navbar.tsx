@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 
@@ -18,9 +19,19 @@ export function Navbar() {
   return (
     <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
-        <Link href="/" className="leading-tight">
-          <div className="text-xs font-semibold tracking-tight">City of San Jose del Monte</div>
-          <div className="text-xs text-muted-foreground">People&apos;s Budget Portal</div>
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/San-Jose-del-Monte-Official-Seal.png"
+            alt="City of San Jose del Monte Official Seal"
+            width={36}
+            height={36}
+            className="rounded-full"
+            priority
+          />
+          <div className="leading-tight">
+            <div className="text-xs font-semibold tracking-tight">City of San Jose del Monte</div>
+            <div className="text-xs text-muted-foreground">People&apos;s Budget Portal</div>
+          </div>
         </Link>
         <nav className="flex items-center gap-1">
           {links.map((link) => (
