@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import type { Contract } from "@/lib/types";
 import { formatPeso } from "@/lib/data";
 
@@ -40,6 +40,11 @@ export function ProcurementTable({ contracts }: Props) {
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, [selectedCategories, selectedStatuses, page]);
 
   const categories = useMemo(
     () => [...new Set(contracts.map((c) => c.category))].sort(),
@@ -183,6 +188,7 @@ export function ProcurementTable({ contracts }: Props) {
         )}
       </div>
 
+      <div ref={resultsRef}>
       {/* Mobile card layout */}
       <div className="md:hidden space-y-3">
         {paginated.length === 0 ? (
@@ -289,6 +295,7 @@ export function ProcurementTable({ contracts }: Props) {
             )}
           </tbody>
         </table>
+      </div>
       </div>
 
       <div className="flex items-center justify-between pt-1">
