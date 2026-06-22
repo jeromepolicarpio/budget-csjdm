@@ -138,7 +138,7 @@ export function ProcurementTable({ contracts }: Props) {
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
+        <table className="min-w-full text-sm">
           <thead className="bg-muted">
             <tr>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
