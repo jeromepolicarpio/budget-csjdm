@@ -35,8 +35,8 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 
 export function ProcurementTable({ contracts }: Props) {
   const [query, setQuery] = useState("");
-  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
-  const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(new Set());
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [page, setPage] = useState(1);
@@ -69,20 +69,16 @@ export function ProcurementTable({ contracts }: Props) {
   }, [contracts]);
 
   const toggleCategory = (cat: string) => {
-    setSelectedCategories((prev) => {
-      const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
-      return next;
-    });
+    setSelectedCategories((prev) =>
+      prev.includes(cat) ? prev.filter((c) => c !== cat) : [...prev, cat]
+    );
     setPage(1);
   };
 
   const toggleStatus = (status: string) => {
-    setSelectedStatuses((prev) => {
-      const next = new Set(prev);
-      next.has(status) ? next.delete(status) : next.add(status);
-      return next;
-    });
+    setSelectedStatuses((prev) =>
+      prev.includes(status) ? prev.filter((s) => s !== status) : [...prev, status]
+    );
     setPage(1);
   };
 
@@ -97,8 +93,8 @@ export function ProcurementTable({ contracts }: Props) {
   };
 
   const clearFilters = () => {
-    setSelectedCategories(new Set());
-    setSelectedStatuses(new Set());
+    setSelectedCategories([]);
+    setSelectedStatuses([]);
     setPage(1);
   };
 
@@ -112,11 +108,11 @@ export function ProcurementTable({ contracts }: Props) {
           c.awardee.toLowerCase().includes(q)
       );
     }
-    if (selectedCategories.size > 0) {
-      result = result.filter((c) => selectedCategories.has(c.category));
+    if (selectedCategories.length > 0) {
+      result = result.filter((c) => selectedCategories.includes(c.category));
     }
-    if (selectedStatuses.size > 0) {
-      result = result.filter((c) => selectedStatuses.has(c.status));
+    if (selectedStatuses.length > 0) {
+      result = result.filter((c) => selectedStatuses.includes(c.status));
     }
     if (sortKey) {
       result = [...result].sort((a, b) => {
@@ -131,8 +127,17 @@ export function ProcurementTable({ contracts }: Props) {
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
   const safePage = Math.min(page, totalPages);
-  const paginated = filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
-  const hasFilters = selectedCategories.size > 0 || selectedStatuses.size > 0;
+
+  const paginated = useMemo(
+    () => filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE),
+    [filtered, safePage]
+  );
+
+  // Changes whenever the displayed dataset changes, ensuring React fully
+  // replaces rows rather than patching stale ones in-place.
+  const viewKey = `${filtered.length}-${safePage}-${selectedCategories.join(",")}-${selectedStatuses.join(",")}`;
+
+  const hasFilters = selectedCategories.length > 0 || selectedStatuses.length > 0;
   const start = filtered.length === 0 ? 0 : (safePage - 1) * ITEMS_PER_PAGE + 1;
   const end = Math.min(safePage * ITEMS_PER_PAGE, filtered.length);
 
@@ -153,7 +158,7 @@ export function ProcurementTable({ contracts }: Props) {
             key={cat}
             onClick={() => toggleCategory(cat)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              selectedCategories.has(cat)
+              selectedCategories.includes(cat)
                 ? (CATEGORY_COLORS[cat] ?? "bg-primary text-primary-foreground") + " border-transparent"
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
             }`}
@@ -170,7 +175,7 @@ export function ProcurementTable({ contracts }: Props) {
             key={status}
             onClick={() => toggleStatus(status)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
-              selectedStatuses.has(status)
+              selectedStatuses.includes(status)
                 ? (STATUS_COLORS[status] ?? "bg-primary text-primary-foreground") + " border-transparent"
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
             }`}
@@ -196,8 +201,8 @@ export function ProcurementTable({ contracts }: Props) {
             No contracts match the current filters.
           </div>
         ) : (
-          paginated.map((c) => (
-            <div key={c.id} className="border rounded-lg p-4 space-y-2">
+          paginated.map((c, i) => (
+            <div key={`${viewKey}-${i}`} className="border rounded-lg p-4 space-y-2">
               <p className="font-medium leading-snug text-sm">{c.title}</p>
               <p className="text-xs text-muted-foreground">{c.awardee}</p>
               <div className="flex flex-wrap items-center gap-2 pt-1">
@@ -266,9 +271,9 @@ export function ProcurementTable({ contracts }: Props) {
                 </td>
               </tr>
             ) : (
-              paginated.map((c) => (
+              paginated.map((c, i) => (
                 <tr
-                  key={c.id}
+                  key={`${viewKey}-${i}`}
                   title={`Contract ID: ${c.id}`}
                   className="border-t hover:bg-muted/50 transition-colors"
                 >

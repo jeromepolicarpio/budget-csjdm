@@ -24,7 +24,7 @@ export function categorizeTitle(title: string): string {
     t.includes("school")
   )
     return "Buildings";
-  if (t.includes("light") || t.includes("lamp")) return "Street Lighting";
+  if (t.includes("light") || (t.includes("lamp") && !t.includes("clamp"))) return "Street Lighting";
   if (t.includes("health") || t.includes("medical") || t.includes("hospital"))
     return "Health";
   return "Other";
