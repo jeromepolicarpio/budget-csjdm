@@ -119,7 +119,13 @@ export async function fetchLiveDpwhProjects(): Promise<DpwhProject[]> {
   ]);
 
   const hits = [...(pages[0].hits ?? []), ...(pages[1].hits ?? [])];
-  return hits.map(normalizeDpwhHit);
+  return hits
+    .filter((h) =>
+      str(h.PROJECT_DESCRIPTION ?? h.description ?? h.DESCRIPTION ?? "")
+        .toLowerCase()
+        .includes("san jose del monte")
+    )
+    .map(normalizeDpwhHit);
 }
 
 // ── BLGF ──────────────────────────────────────────────────────────────────
