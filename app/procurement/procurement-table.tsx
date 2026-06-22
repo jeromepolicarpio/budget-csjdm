@@ -138,22 +138,16 @@ export function ProcurementTable({ contracts }: Props) {
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
-        <table className="min-w-full table-fixed text-sm">
-          <colgroup>
-            <col className="w-[30%]" />
-            <col className="w-[25%]" />
-            <col className="w-[150px]" />
-            <col className="w-[130px]" />
-            <col className="w-[110px]" />
-            <col className="w-[110px]" />
-          </colgroup>
+        <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr>
+              {/* Title takes all remaining space */}
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Awardee</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Category</th>
+              {/* All other columns shrink to content width via w-px + whitespace-nowrap */}
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Awardee</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Category</th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground"
+                className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap"
                 aria-sort={sortKey === "amount" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -164,7 +158,7 @@ export function ProcurementTable({ contracts }: Props) {
                 </button>
               </th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground"
+                className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap"
                 aria-sort={sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -174,7 +168,7 @@ export function ProcurementTable({ contracts }: Props) {
                   Date <SortIcon active={sortKey === "date"} dir={sortDir} />
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Status</th>
             </tr>
           </thead>
           <tbody>
@@ -194,16 +188,16 @@ export function ProcurementTable({ contracts }: Props) {
                   <td className="px-4 py-3">
                     <p className="font-medium leading-snug">{c.title}</p>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground truncate">{c.awardee}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
+                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.awardee}</td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
                       {c.category}
                     </span>
                   </td>
                   <td className="px-4 py-3 font-semibold whitespace-nowrap">{formatPeso(c.amount)}</td>
                   <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.date}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${STATUS_COLORS[c.status]}`}>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[c.status]}`}>
                       {c.status}
                     </span>
                   </td>
