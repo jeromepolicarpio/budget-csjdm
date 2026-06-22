@@ -137,7 +137,7 @@ export function ProcurementTable({ contracts }: Props) {
         ))}
       </div>
 
-      <div className="overflow-x-auto rounded-lg border">
+      <div className="overflow-x-auto rounded-lg border pr-2">
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr>

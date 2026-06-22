@@ -18,7 +18,7 @@ export default async function ProcurementPage() {
     .reduce((sum, c) => sum + c.amount, 0);
 
   return (
-    <div className="max-w-6xl mx-auto px-4 py-10">
+    <div className="max-w-7xl mx-auto px-6 py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-1">Procurement & Contracts</h1>
       <p className="text-muted-foreground mb-8">
         Government contracts awarded in CSJDM via PhilGEPS (Philippine Government Electronic Procurement System).
