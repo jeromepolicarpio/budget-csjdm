@@ -46,6 +46,23 @@ export function ProcurementTable({ contracts }: Props) {
     [contracts]
   );
 
+  const statuses = useMemo(
+    () => [...new Set(contracts.map((c) => c.status))].sort(),
+    [contracts]
+  );
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of contracts) counts[c.category] = (counts[c.category] ?? 0) + 1;
+    return counts;
+  }, [contracts]);
+
+  const statusCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const c of contracts) counts[c.status] = (counts[c.status] ?? 0) + 1;
+    return counts;
+  }, [contracts]);
+
   const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
@@ -136,24 +153,24 @@ export function ProcurementTable({ contracts }: Props) {
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
             }`}
           >
-            {cat}
+            {cat} <span className="opacity-60">({categoryCounts[cat] ?? 0})</span>
           </button>
         ))}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-xs text-muted-foreground pr-1">Status:</span>
-        {(["Active", "Completed", "Cancelled"] as const).map((status) => (
+        {statuses.map((status) => (
           <button
             key={status}
             onClick={() => toggleStatus(status)}
             className={`px-3 py-1 rounded-full text-xs font-medium border transition-colors ${
               selectedStatuses.has(status)
-                ? STATUS_COLORS[status] + " border-transparent"
+                ? (STATUS_COLORS[status] ?? "bg-primary text-primary-foreground") + " border-transparent"
                 : "bg-background text-muted-foreground border-border hover:bg-muted"
             }`}
           >
-            {status}
+            {status} <span className="opacity-60">({statusCounts[status] ?? 0})</span>
           </button>
         ))}
         {hasFilters && (
