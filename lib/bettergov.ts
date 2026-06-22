@@ -66,7 +66,10 @@ function normalizeDpwhHit(hit: Record<string, unknown>): DpwhProject {
     ),
     description,
     category,
-    status: str(hit.STATUS ?? hit.status ?? ""),
+    status: (() => {
+      const raw = str(hit.STATUS ?? hit.status ?? "");
+      return raw.toLowerCase() === "on-going" ? "On-going" : raw;
+    })(),
     budget: Math.round(num(hit.CONTRACT_AMOUNT ?? hit.budget ?? hit.BUDGET ?? 0)),
     amountPaid: Math.round(num(hit.AMOUNT_PAID ?? hit.amount_paid ?? hit.amountPaid ?? 0)),
     progress: Math.round(num(hit.PROGRESS ?? hit.progress ?? 0)),
