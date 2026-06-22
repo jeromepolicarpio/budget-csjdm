@@ -43,10 +43,11 @@ export default async function HomePage() {
           <Badge variant="outline" className="mb-5 border-primary/30 text-primary bg-primary/5">
             San Jose del Monte, Bulacan · Citizen-Built · Open Data
           </Badge>
-          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-4 leading-tight">
-            <span className="block">City of San Jose</span>
-            <span className="block text-primary">del Monte</span>
+          <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-3 leading-tight">
+            <span className="block">People&apos;s</span>
+            <span className="block text-primary">Budget Portal</span>
           </h1>
+          <p className="text-sm font-medium text-muted-foreground mb-4">City of San Jose del Monte, Bulacan</p>
           <p className="text-muted-foreground text-lg mb-12 max-w-xl">
             Track how CSJDM spends your taxes — budget, contracts, and infrastructure.
             No spin. Just numbers.
