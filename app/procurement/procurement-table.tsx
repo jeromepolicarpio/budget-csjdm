@@ -143,7 +143,7 @@ export function ProcurementTable({ contracts }: Props) {
             <tr>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Awardee</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Category</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Category</th>
               <th
                 className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap"
                 aria-sort={sortKey === "amount" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
@@ -187,8 +187,8 @@ export function ProcurementTable({ contracts }: Props) {
                     <p className="font-medium leading-snug">{c.title}</p>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.awardee}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
                       {c.category}
                     </span>
                   </td>
