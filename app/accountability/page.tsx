@@ -37,6 +37,19 @@ export default async function AccountabilityPage() {
   // PhilGEPS reference ID for the CSJDM Sports Complex contract (awarded 2020)
   const sportsContract = contracts.filter((c) => c.id === "20CD0147");
 
+  const floodSince = floodProjectsList.reduce(
+    (min, p) => (p.infraYear && p.infraYear < min ? p.infraYear : min),
+    "9999"
+  );
+  const floodSinceYear = floodSince === "9999" ? "2020" : floodSince;
+
+  const evacCenter = projects.find((p) => p.contractId === "23CD0301");
+  const evacProgress = evacCenter ? evacCenter.progress : null;
+  const evacDetail =
+    evacProgress !== null
+      ? ` The evacuation center in Brgy. San Rafael I (Contract 23CD0301) was only ${evacProgress}% complete when floods hit.`
+      : "";
+
   const findings: Finding[] = [
     {
       type: "critical",
@@ -47,7 +60,7 @@ export default async function AccountabilityPage() {
     {
       type: "critical",
       title: `Flooding Persists Despite ${formatPeso(floodBudget)} in Flood Projects`,
-      detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since 2020. In June 2025, 22 barangays were still inundated — floodwater rose neck-deep in 45 minutes. The evacuation center in Brgy. San Rafael I (Contract 23CD0301) was still only 50% complete when floods hit.`,
+      detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since ${floodSinceYear}. In June 2025, 22 barangays were still inundated — residents in low-lying barangays reported waist-deep flooding within hours of heavy rain.${evacDetail}`,
       relatedProjects: floodProjectsList,
     },
     {
