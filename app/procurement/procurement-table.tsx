@@ -138,14 +138,22 @@ export function ProcurementTable({ contracts }: Props) {
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
-        <table className="min-w-full text-sm">
+        <table className="min-w-full table-fixed text-sm">
+          <colgroup>
+            <col className="w-[30%]" />
+            <col className="w-[25%]" />
+            <col className="w-[150px]" />
+            <col className="w-[130px]" />
+            <col className="w-[110px]" />
+            <col className="w-[110px]" />
+          </colgroup>
           <thead className="bg-muted">
             <tr>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Awardee</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap min-w-[140px]">Category</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Awardee</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Category</th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap"
+                className="px-4 py-3 text-left font-medium text-muted-foreground"
                 aria-sort={sortKey === "amount" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -156,7 +164,7 @@ export function ProcurementTable({ contracts }: Props) {
                 </button>
               </th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap"
+                className="px-4 py-3 text-left font-medium text-muted-foreground"
                 aria-sort={sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -183,19 +191,19 @@ export function ProcurementTable({ contracts }: Props) {
                   title={`Contract ID: ${c.id}`}
                   className="border-t hover:bg-muted/50 transition-colors"
                 >
-                  <td className="px-4 py-3 max-w-xs">
+                  <td className="px-4 py-3">
                     <p className="font-medium leading-snug">{c.title}</p>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.awardee}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
+                  <td className="px-4 py-3 text-muted-foreground truncate">{c.awardee}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
                       {c.category}
                     </span>
                   </td>
                   <td className="px-4 py-3 font-semibold whitespace-nowrap">{formatPeso(c.amount)}</td>
                   <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.date}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[c.status]}`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${STATUS_COLORS[c.status]}`}>
                       {c.status}
                     </span>
                   </td>
