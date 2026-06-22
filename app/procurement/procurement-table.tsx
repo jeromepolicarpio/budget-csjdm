@@ -4,6 +4,8 @@ import { useState, useMemo } from "react";
 import type { Contract } from "@/lib/types";
 import { formatPeso } from "@/lib/data";
 
+const ITEMS_PER_PAGE = 10;
+
 const STATUS_COLORS: Record<string, string> = {
   Active: "bg-green-100 text-green-800",
   Completed: "bg-blue-100 text-blue-800",
@@ -37,25 +39,30 @@ export function ProcurementTable({ contracts }: Props) {
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(new Set());
   const [sortKey, setSortKey] = useState<SortKey | null>(null);
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [page, setPage] = useState(1);
 
   const categories = useMemo(
     () => [...new Set(contracts.map((c) => c.category))].sort(),
     [contracts]
   );
 
-  const toggleCategory = (cat: string) =>
+  const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
       next.has(cat) ? next.delete(cat) : next.add(cat);
       return next;
     });
+    setPage(1);
+  };
 
-  const toggleStatus = (status: string) =>
+  const toggleStatus = (status: string) => {
     setSelectedStatuses((prev) => {
       const next = new Set(prev);
       next.has(status) ? next.delete(status) : next.add(status);
       return next;
     });
+    setPage(1);
+  };
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -64,6 +71,13 @@ export function ProcurementTable({ contracts }: Props) {
       setSortKey(key);
       setSortDir("desc");
     }
+    setPage(1);
+  };
+
+  const clearFilters = () => {
+    setSelectedCategories(new Set());
+    setSelectedStatuses(new Set());
+    setPage(1);
   };
 
   const filtered = useMemo(() => {
@@ -93,18 +107,25 @@ export function ProcurementTable({ contracts }: Props) {
     return result;
   }, [contracts, query, selectedCategories, selectedStatuses, sortKey, sortDir]);
 
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+  const hasFilters = selectedCategories.size > 0 || selectedStatuses.size > 0;
+  const start = filtered.length === 0 ? 0 : (safePage - 1) * ITEMS_PER_PAGE + 1;
+  const end = Math.min(safePage * ITEMS_PER_PAGE, filtered.length);
+
   return (
     <div className="space-y-3">
       <input
         type="text"
         placeholder="Search by title or awardee..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
       />
 
-      <div className="flex flex-wrap gap-2">
-        <span className="text-xs text-muted-foreground self-center pr-1">Category:</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted-foreground pr-1">Category:</span>
         {categories.map((cat) => (
           <button
             key={cat}
@@ -120,8 +141,8 @@ export function ProcurementTable({ contracts }: Props) {
         ))}
       </div>
 
-      <div className="flex flex-wrap gap-2">
-        <span className="text-xs text-muted-foreground self-center pr-1">Status:</span>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-muted-foreground pr-1">Status:</span>
         {(["Active", "Completed", "Cancelled"] as const).map((status) => (
           <button
             key={status}
@@ -135,19 +156,33 @@ export function ProcurementTable({ contracts }: Props) {
             {status}
           </button>
         ))}
+        {hasFilters && (
+          <button
+            onClick={clearFilters}
+            className="ml-2 px-3 py-1 rounded-full text-xs font-medium border border-border text-muted-foreground hover:bg-destructive/10 hover:text-destructive hover:border-destructive/30 transition-colors"
+          >
+            ✕ Clear
+          </button>
+        )}
       </div>
 
-      <div className="overflow-x-auto rounded-lg border pr-2">
-        <table className="w-full text-sm">
+      <div className="rounded-lg border">
+        <table className="w-full table-fixed text-sm">
+          <colgroup>
+            <col style={{ width: "32%" }} />
+            <col style={{ width: "23%" }} />
+            <col style={{ width: "15%" }} />
+            <col style={{ width: "14%" }} />
+            <col style={{ width: "9%" }} />
+            <col style={{ width: "7%" }} />
+          </colgroup>
           <thead className="bg-muted">
             <tr>
-              {/* Title takes all remaining space */}
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
-              {/* All other columns shrink to content width via w-px + whitespace-nowrap */}
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Awardee</th>
-              <th className="px-4 py-3 pr-10 text-left font-medium text-muted-foreground whitespace-nowrap">Category</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Awardee</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Category</th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap"
+                className="px-4 py-3 text-left font-medium text-muted-foreground"
                 aria-sort={sortKey === "amount" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -158,7 +193,7 @@ export function ProcurementTable({ contracts }: Props) {
                 </button>
               </th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap"
+                className="px-4 py-3 text-left font-medium text-muted-foreground"
                 aria-sort={sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -168,18 +203,18 @@ export function ProcurementTable({ contracts }: Props) {
                   Date <SortIcon active={sortKey === "date"} dir={sortDir} />
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Status</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Status</th>
             </tr>
           </thead>
           <tbody>
-            {filtered.length === 0 ? (
+            {paginated.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-8 text-center text-muted-foreground">
+                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                   No contracts match the current filters.
                 </td>
               </tr>
             ) : (
-              filtered.map((c) => (
+              paginated.map((c) => (
                 <tr
                   key={c.id}
                   title={`Contract ID: ${c.id}`}
@@ -188,16 +223,18 @@ export function ProcurementTable({ contracts }: Props) {
                   <td className="px-4 py-3">
                     <p className="font-medium leading-snug">{c.title}</p>
                   </td>
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.awardee}</td>
-                  <td className="px-4 py-3 pr-10 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
+                  <td className="px-4 py-3 text-muted-foreground truncate" title={c.awardee}>
+                    {c.awardee}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
                       {c.category}
                     </span>
                   </td>
-                  <td className="px-4 py-3 font-semibold whitespace-nowrap">{formatPeso(c.amount)}</td>
-                  <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{c.date}</td>
-                  <td className="px-4 py-3 whitespace-nowrap">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[c.status]}`}>
+                  <td className="px-4 py-3 font-semibold tabular-nums">{formatPeso(c.amount)}</td>
+                  <td className="px-4 py-3 text-muted-foreground tabular-nums">{c.date}</td>
+                  <td className="px-4 py-3">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${STATUS_COLORS[c.status]}`}>
                       {c.status}
                     </span>
                   </td>
@@ -207,9 +244,35 @@ export function ProcurementTable({ contracts }: Props) {
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-muted-foreground">
-        Showing {filtered.length} of {contracts.length} contracts
-      </p>
+
+      <div className="flex items-center justify-between pt-1">
+        <p className="text-xs text-muted-foreground">
+          {filtered.length === 0
+            ? "No results"
+            : `Showing ${start}–${end} of ${filtered.length} contracts`}
+        </p>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="px-3 py-1.5 rounded-md text-xs font-medium border border-border hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ← Prev
+            </button>
+            <span className="px-3 py-1.5 text-xs text-muted-foreground">
+              {safePage} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="px-3 py-1.5 rounded-md text-xs font-medium border border-border hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
