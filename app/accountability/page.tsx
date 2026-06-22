@@ -102,7 +102,7 @@ export default async function AccountabilityPage() {
         </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 mb-10">
+      <div className="grid grid-cols-3 gap-3 sm:gap-4 mb-10">
         {(["critical", "warn", "ok"] as FindingType[]).map((type) => {
           const count = findings.filter((f) => f.type === type).length;
           const labels = { critical: "Critical Issues", warn: "Warnings", ok: "OK" };

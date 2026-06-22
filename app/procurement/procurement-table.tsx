@@ -166,7 +166,36 @@ export function ProcurementTable({ contracts }: Props) {
         )}
       </div>
 
-      <div className="rounded-lg border">
+      {/* Mobile card layout */}
+      <div className="md:hidden space-y-3">
+        {paginated.length === 0 ? (
+          <div className="border rounded-lg px-4 py-10 text-center text-muted-foreground text-sm">
+            No contracts match the current filters.
+          </div>
+        ) : (
+          paginated.map((c) => (
+            <div key={c.id} className="border rounded-lg p-4 space-y-2">
+              <p className="font-medium leading-snug text-sm">{c.title}</p>
+              <p className="text-xs text-muted-foreground">{c.awardee}</p>
+              <div className="flex flex-wrap items-center gap-2 pt-1">
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
+                  {c.category}
+                </span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[c.status] ?? "bg-muted text-muted-foreground"}`}>
+                  {c.status}
+                </span>
+              </div>
+              <div className="flex items-center justify-between pt-1">
+                <span className="font-semibold tabular-nums text-sm">{formatPeso(c.amount)}</span>
+                <span className="text-xs text-muted-foreground tabular-nums">{c.date}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table layout */}
+      <div className="hidden md:block rounded-lg border overflow-x-auto">
         <table className="w-full table-fixed text-sm">
           <colgroup>
             <col style={{ width: "32%" }} />
@@ -232,9 +261,9 @@ export function ProcurementTable({ contracts }: Props) {
                     </span>
                   </td>
                   <td className="px-4 py-3 font-semibold tabular-nums">{formatPeso(c.amount)}</td>
-                  <td className="px-4 py-3 text-muted-foreground tabular-nums">{c.date}</td>
+                  <td className="px-4 py-3 text-muted-foreground tabular-nums whitespace-nowrap">{c.date}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${STATUS_COLORS[c.status]}`}>
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${STATUS_COLORS[c.status] ?? "bg-muted text-muted-foreground"}`}>
                       {c.status}
                     </span>
                   </td>
