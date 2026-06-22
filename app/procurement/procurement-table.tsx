@@ -138,16 +138,16 @@ export function ProcurementTable({ contracts }: Props) {
       </div>
 
       <div className="overflow-x-auto rounded-lg border">
-        <table className="w-full text-sm">
+        <table className="w-max min-w-full text-sm">
           <thead className="bg-muted">
             <tr>
               {/* Title takes all remaining space */}
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
               {/* All other columns shrink to content width via w-px + whitespace-nowrap */}
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Awardee</th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Category</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Awardee</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Category</th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap"
+                className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap"
                 aria-sort={sortKey === "amount" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -158,7 +158,7 @@ export function ProcurementTable({ contracts }: Props) {
                 </button>
               </th>
               <th
-                className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap"
+                className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap"
                 aria-sort={sortKey === "date" ? (sortDir === "asc" ? "ascending" : "descending") : "none"}
               >
                 <button
@@ -168,7 +168,7 @@ export function ProcurementTable({ contracts }: Props) {
                   Date <SortIcon active={sortKey === "date"} dir={sortDir} />
                 </button>
               </th>
-              <th className="px-4 py-3 text-left font-medium text-muted-foreground w-px whitespace-nowrap">Status</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground whitespace-nowrap">Status</th>
             </tr>
           </thead>
           <tbody>
