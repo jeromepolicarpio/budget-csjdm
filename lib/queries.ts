@@ -66,7 +66,7 @@ function normalizePhilGepsHit(hit: Record<string, unknown>): Contract | null {
     awardee: s(hit.awardee_name ?? hit.awardee ?? hit.contractor ?? ""),
     amount: n(hit.contract_amount ?? hit.amount ?? hit.award_amount ?? 0),
     category: categorizeTitle(title),
-    date: s(hit.award_date ?? hit.date ?? ""),
+    date: s(hit.award_date ?? hit.date ?? "").slice(0, 10),
     status,
   };
 }

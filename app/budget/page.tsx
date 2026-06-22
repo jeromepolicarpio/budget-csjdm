@@ -8,6 +8,19 @@ import { BudgetCharts } from "./budget-charts";
 
 export default async function BudgetPage() {
   const budgetData = await getBudgetYears();
+
+  if (budgetData.length === 0) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold tracking-tight mb-4">Budget Dashboard</h1>
+        <p className="text-muted-foreground">
+          No budget data available yet. Run{" "}
+          <code className="bg-muted px-1 rounded">npx tsx scripts/import-blgf.ts</code> to import BLGF fiscal data.
+        </p>
+      </div>
+    );
+  }
+
   const latest = budgetData[budgetData.length - 1];
   const surplus = latest.income - latest.expenditure;
 
@@ -17,14 +30,6 @@ export default async function BudgetPage() {
       <p className="text-muted-foreground mb-4">
         CSJDM annual fiscal data sourced from BLGF (Bureau of Local Government Finance).
       </p>
-      <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 mb-8 flex gap-2 text-sm text-amber-800">
-        <span className="font-semibold shrink-0">⚠ Unverified figures:</span>
-        <span>Budget numbers below are placeholder estimates, not official BLGF records. To load real data, download the CSV from{" "}
-          <a href="https://data.bettergov.ph/datasets/9" target="_blank" rel="noopener noreferrer" className="underline font-medium">data.bettergov.ph/datasets/9</a>{" "}
-          then run <code className="bg-amber-100 px-1 rounded">npm run import:blgf</code>.
-        </span>
-      </div>
-
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         {[
           { label: `${latest.year} Income`, value: formatPeso(latest.income) },
@@ -79,11 +84,8 @@ export default async function BudgetPage() {
         </table>
       </div>
       <p className="text-xs text-muted-foreground mt-3">
-        Source: BLGF LGU Fiscal Data via{" "}
-        <a href="https://data.bettergov.ph/datasets/9" target="_blank" rel="noopener noreferrer" className="underline">
-          BetterGov.ph Dataset #9
-        </a>
-        . Run <code className="bg-muted px-1 rounded">npx tsx scripts/import-blgf.ts</code> to refresh.
+        Source: BLGF (Bureau of Local Government Finance) — Annual Statement of Receipts and Expenditures.
+        Refresh: <code className="bg-muted px-1 rounded">npx tsx scripts/import-blgf.ts</code>
       </p>
     </div>
   );
