@@ -79,7 +79,7 @@ export default async function HomePage() {
           <p className="text-xs text-muted-foreground uppercase tracking-widest font-medium mb-4">
             {latest.year} Budget Process
           </p>
-          <div className="flex items-center overflow-x-auto">
+          <div className="flex items-center overflow-x-auto py-2">
             {BUDGET_STEPS.map((step, i) => (
               <div key={step.label} className="flex items-center min-w-0 flex-1 last:flex-none">
                 <div className="flex flex-col items-center text-center min-w-[110px]">
