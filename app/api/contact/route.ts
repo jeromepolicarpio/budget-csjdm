@@ -23,6 +23,13 @@ export async function POST(req: NextRequest) {
     typeof message !== "string" ||
     message.trim().length < 5
   ) {
+    console.error("[contact] 422 — fields:", {
+      emailOk: typeof email === "string" && email.includes("@"),
+      reasonOk: isValidReason(reason),
+      reason,
+      messageOk: typeof message === "string" && (message as string).trim().length >= 5,
+      messageLength: typeof message === "string" ? (message as string).trim().length : null,
+    });
     return NextResponse.json({ error: "Invalid fields" }, { status: 422 });
   }
 
