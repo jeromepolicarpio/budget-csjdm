@@ -38,8 +38,7 @@ export default async function BudgetPage() {
       <div className="max-w-6xl mx-auto px-4 py-10">
         <h1 className="text-3xl font-bold tracking-tight mb-4">Budget Dashboard</h1>
         <p className="text-muted-foreground">
-          No budget data available yet. Run{" "}
-          <code className="bg-muted px-1 rounded">npx tsx scripts/import-blgf.ts</code> to import BLGF fiscal data.
+          No budget data available yet.
         </p>
       </div>
     );
@@ -86,11 +85,15 @@ export default async function BudgetPage() {
         <table className="w-full text-sm">
           <thead className="bg-muted">
             <tr>
-              {["Year", "Income", "Expenditure", "Surplus", "DRRF", "SEF"].map((h) => (
-                <th key={h} className="px-4 py-3 text-left font-medium text-muted-foreground">
-                  {h}
-                </th>
+              {(["Year", "Income", "Expenditure", "Surplus"] as const).map((h) => (
+                <th key={h} className="px-4 py-3 text-left font-medium text-muted-foreground">{h}</th>
               ))}
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <abbr title="Disaster Risk Reduction Fund">DRRF</abbr>
+              </th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">
+                <abbr title="Special Education Fund">SEF</abbr>
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -124,8 +127,7 @@ export default async function BudgetPage() {
         </table>
       </div>
       <p className="text-xs text-muted-foreground mt-3">
-        Source: BLGF (Bureau of Local Government Finance) — Annual Statement of Receipts and Expenditures.
-        Refresh: <code className="bg-muted px-1 rounded">npx tsx scripts/import-blgf.ts</code>
+        Source: <abbr title="Bureau of Local Government Finance">BLGF</abbr> Annual Statement of Receipts and Expenditures.
       </p>
     </div>
   );

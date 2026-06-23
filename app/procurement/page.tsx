@@ -19,7 +19,7 @@ export default async function ProcurementPage() {
     .reduce((sum, c) => sum + c.amount, 0);
 
   return (
-    <div className="max-w-7xl mx-auto px-6 py-10">
+    <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-1">Procurement & Contracts</h1>
       <p className="text-muted-foreground mb-8">
         Government contracts awarded in CSJDM via PhilGEPS (Philippine Government Electronic Procurement System).
@@ -66,8 +66,7 @@ export default async function ProcurementPage() {
 
       <ProcurementTable contracts={contracts} />
       <p className="text-xs text-muted-foreground mt-3">
-        Source: PhilGEPS contract awards. Run{" "}
-        <code className="bg-muted px-1 rounded">npx tsx scripts/scrape-philgeps.ts</code> to refresh live data.
+        Source: <abbr title="Philippine Government Electronic Procurement System">PhilGEPS</abbr> contract awards.
       </p>
     </div>
   );

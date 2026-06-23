@@ -113,11 +113,11 @@ export default async function ProjectsPage() {
       <ProjectsList projects={projects} />
 
       <p className="text-xs text-muted-foreground mt-6">
-        Source: DPWH Infrastructure Transparency Dataset via{" "}
+        Source: <abbr title="Department of Public Works and Highways">DPWH</abbr> Infrastructure Transparency Dataset via{" "}
         <a href="https://data.bettergov.ph/datasets/19" target="_blank" rel="noopener noreferrer" className="underline">
           BetterGov.ph Dataset #19
         </a>
-        . Run <code className="bg-muted px-1 rounded">npx tsx scripts/scrape-dpwh.ts</code> to refresh.
+        .
       </p>
     </div>
   );

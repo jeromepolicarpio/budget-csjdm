@@ -54,6 +54,7 @@ export function Navbar() {
             <Link
               key={link.href}
               href={link.href}
+              aria-current={pathname === link.href ? "page" : undefined}
               className={cn(
                 "px-3 py-1.5 rounded-md text-sm transition-colors",
                 pathname === link.href
@@ -87,12 +88,13 @@ export function Navbar() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div id="mobile-menu" className="sm:hidden border-t bg-background/95 backdrop-blur">
+        <div id="mobile-menu" className="sm:hidden border-t bg-background/95 backdrop-blur animate-in fade-in slide-in-from-top-1 duration-150">
           <nav className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-1">
             {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={pathname === link.href ? "page" : undefined}
                 onClick={() => setOpen(false)}
                 className={cn(
                   "px-3 py-2.5 rounded-md text-sm transition-colors",

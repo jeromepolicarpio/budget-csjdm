@@ -82,9 +82,9 @@ export default async function AccountabilityPage() {
   ];
 
   const icons: Record<FindingType, React.ReactNode> = {
-    critical: <XCircle className="text-red-500 shrink-0 mt-0.5" size={20} />,
-    warn: <AlertTriangle className="text-amber-500 shrink-0 mt-0.5" size={20} />,
-    ok: <CheckCircle className="text-green-500 shrink-0 mt-0.5" size={20} />,
+    critical: <XCircle aria-hidden="true" className="text-red-500 shrink-0 mt-0.5" size={20} />,
+    warn: <AlertTriangle aria-hidden="true" className="text-amber-500 shrink-0 mt-0.5" size={20} />,
+    ok: <CheckCircle aria-hidden="true" className="text-green-500 shrink-0 mt-0.5" size={20} />,
   };
 
   const bgColors: Record<FindingType, string> = {

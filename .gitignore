@@ -49,3 +49,7 @@ verify-screenshots/
 worker_index.tmp
 code-review-analyst.md
 cropped.png
+
+# design tool artifacts
+.impeccable/
+DESIGN_TODO.md

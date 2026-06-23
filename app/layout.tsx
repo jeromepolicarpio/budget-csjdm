@@ -37,7 +37,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <a href="https://data.bettergov.ph" target="_blank" rel="noopener noreferrer" className="underline hover:text-foreground">
                   BetterGov.ph
                 </a>
-                , BLGF, PhilGEPS, and DPWH open data.
+                ,{" "}
+                <abbr title="Bureau of Local Government Finance">BLGF</abbr>,{" "}
+                <abbr title="Philippine Government Electronic Procurement System">PhilGEPS</abbr>, and{" "}
+                <abbr title="Department of Public Works and Highways">DPWH</abbr> open data.
               </p>
               <p className="mt-1">&ldquo;Para sa bawat San Joseño&rdquo; — Not affiliated with the City Government of CSJDM.</p>
             </div>
