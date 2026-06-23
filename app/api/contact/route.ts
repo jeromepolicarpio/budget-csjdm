@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid fields" }, { status: 422 });
   }
 
-  if (!process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY?.replace(/^﻿/, "").trim();
+
+  if (!apiKey) {
     console.error("[contact] RESEND_API_KEY is not set");
     return NextResponse.json({ error: "Email service not configured" }, { status: 503 });
   }
@@ -41,7 +43,7 @@ export async function POST(req: NextRequest) {
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
