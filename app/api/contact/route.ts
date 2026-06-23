@@ -39,16 +39,22 @@ export async function POST(req: NextRequest) {
   }
 
   const resend = new Resend(process.env.RESEND_API_KEY);
-  const { error } = await resend.emails.send({
-    from: "CSJDM Budget Portal <onboarding@resend.dev>",
-    to: "policarpiojerome2005@gmail.com",
-    replyTo: email,
-    subject: `[CSJDM Budget] ${reason} — from ${email}`,
-    text: `Reason: ${reason}\nFrom: ${email}\n\n${message.trim()}`,
-  });
 
-  if (error) {
-    console.error("[contact] Resend error:", error);
+  try {
+    const { error } = await resend.emails.send({
+      from: "CSJDM Budget Portal <onboarding@resend.dev>",
+      to: "policarpiojerome2005@gmail.com",
+      replyTo: email,
+      subject: `[CSJDM Budget] ${reason} — from ${email}`,
+      text: `Reason: ${reason}\nFrom: ${email}\n\n${message.trim()}`,
+    });
+
+    if (error) {
+      console.error("[contact] Resend error:", JSON.stringify(error));
+      return NextResponse.json({ error: "Failed to send" }, { status: 500 });
+    }
+  } catch (err) {
+    console.error("[contact] Resend threw:", err instanceof Error ? err.message : String(err));
     return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   }
 
