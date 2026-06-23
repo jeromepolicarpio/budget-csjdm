@@ -62,9 +62,9 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Contact the Maintainer</DialogTitle>
+          <DialogTitle>Got a tip or correction?</DialogTitle>
           <DialogDescription>
-            Spotted a data error or have something to add? Send a message and I&apos;ll look into it.
+            Found wrong data, something missing, or have a suggestion? I read every message.
           </DialogDescription>
         </DialogHeader>
 
@@ -78,7 +78,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="contact-email">
                 Your email
               </label>
@@ -89,14 +89,16 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium">Reason</label>
+            <div className="space-y-2">
+              <label className="text-sm font-medium" htmlFor="contact-reason">
+                Reason
+              </label>
               <Select value={reason} onValueChange={(v) => setReason(v ?? "")} required>
-                <SelectTrigger>
+                <SelectTrigger id="contact-reason">
                   <SelectValue placeholder="Select a reason" />
                 </SelectTrigger>
                 <SelectContent>
@@ -109,32 +111,41 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
               </Select>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-sm font-medium" htmlFor="contact-message">
                 Message
               </label>
               <textarea
                 id="contact-message"
                 required
-                minLength={5}
                 rows={4}
                 placeholder="Describe the issue or suggestion..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus:ring-2 focus:ring-ring focus:ring-offset-2 resize-none"
+                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
               />
             </div>
 
             {status === "error" && (
-              <p className="text-xs text-destructive">Something went wrong — please try again.</p>
+              <p className="text-xs text-destructive">Failed to send — check your connection and try again.</p>
             )}
 
             <div className="flex justify-end gap-2 pt-1">
               <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={status === "sending" || !reason}>
-                {status === "sending" ? "Sending…" : "Send message"}
+              <Button type="submit" disabled={status === "sending" || !reason} className="min-w-[110px]">
+                {status === "sending" ? (
+                  <span className="flex items-center gap-2">
+                    <svg className="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                    </svg>
+                    Sending…
+                  </span>
+                ) : (
+                  "Send message"
+                )}
               </Button>
             </div>
           </form>
