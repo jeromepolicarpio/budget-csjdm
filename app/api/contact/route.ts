@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
 
 const REASONS = ["Data error", "Missing data", "Suggestion", "Other"] as const;
 type Reason = (typeof REASONS)[number];
@@ -38,23 +37,29 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Email service not configured" }, { status: 503 });
   }
 
-  const resend = new Resend(process.env.RESEND_API_KEY);
-
   try {
-    const { error } = await resend.emails.send({
-      from: "CSJDM Budget Portal <onboarding@resend.dev>",
-      to: "policarpiojerome2005@gmail.com",
-      replyTo: email,
-      subject: `[CSJDM Budget] ${reason} — from ${email}`,
-      text: `Reason: ${reason}\nFrom: ${email}\n\n${message.trim()}`,
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "CSJDM Budget Portal <onboarding@resend.dev>",
+        to: ["policarpiojerome2005@gmail.com"],
+        reply_to: [email],
+        subject: `[CSJDM Budget] ${reason} - from ${email}`,
+        text: `Reason: ${reason}\nFrom: ${email}\n\n${message.trim()}`,
+      }),
     });
 
-    if (error) {
-      console.error("[contact] Resend error:", JSON.stringify(error));
+    if (!res.ok) {
+      const body = await res.text();
+      console.error("[contact] Resend API error:", res.status, body);
       return NextResponse.json({ error: "Failed to send" }, { status: 500 });
     }
   } catch (err) {
-    console.error("[contact] Resend threw:", err instanceof Error ? err.message : String(err));
+    console.error("[contact] fetch threw:", err instanceof Error ? err.message : String(err));
     return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   }
 
