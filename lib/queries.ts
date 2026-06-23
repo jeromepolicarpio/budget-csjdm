@@ -77,7 +77,7 @@ export async function getContracts(): Promise<Contract[]> {
   if (liveHits.length > 0) {
     return liveHits
       .map(normalizePhilGepsHit)
-      .filter((c): c is Contract => c !== null)
+      .filter((c): c is Contract => c !== null && c.amount > 0)
       .sort((a, b) => b.date.localeCompare(a.date));
   }
 

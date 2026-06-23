@@ -2,8 +2,8 @@ import type { DpwhProject, BudgetYear } from "./types";
 import { categorizeTitle } from "./categorize";
 
 const MEILISEARCH_URL = "https://search2.bettergov.ph/indexes";
-const MEILISEARCH_KEY =
-  "REDACTED_MEILISEARCH_KEY";
+const MEILISEARCH_KEY = process.env.BETTERGOV_MEILISEARCH_KEY;
+if (!MEILISEARCH_KEY) throw new Error("BETTERGOV_MEILISEARCH_KEY environment variable is not set");
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -67,8 +67,14 @@ function normalizeDpwhHit(hit: Record<string, unknown>): DpwhProject {
     description,
     category,
     status: (() => {
-      const raw = str(hit.STATUS ?? hit.status ?? "");
-      return raw.toLowerCase() === "on-going" ? "On-going" : raw;
+      const raw = str(hit.STATUS ?? hit.status ?? "").trim();
+      const lower = raw.toLowerCase();
+      if (lower === "on-going" || lower === "ongoing") return "On-going";
+      if (lower === "completed" || lower === "complete") return "Completed";
+      if (lower === "terminated") return "Terminated";
+      if (lower === "suspended") return "Suspended";
+      if (lower === "not yet started" || lower === "nys") return "Not Yet Started";
+      return raw;
     })(),
     budget: Math.round(num(hit.CONTRACT_AMOUNT ?? hit.budget ?? hit.BUDGET ?? 0)),
     amountPaid: Math.round(num(hit.AMOUNT_PAID ?? hit.amount_paid ?? hit.amountPaid ?? 0)),
@@ -146,19 +152,37 @@ export async function fetchLiveBlgfData(): Promise<BudgetYear[]> {
 export type RawPhilGepsHit = Record<string, unknown>;
 
 export async function fetchLivePhilGeps(): Promise<RawPhilGepsHit[]> {
-  // 1 000 is Meilisearch's default maxTotalHits — a single request is enough.
-  const data = await meilisearchPost("philgeps", {
-    q: "San Jose del Monte",
-    limit: 1000,
-    sort: ["award_date:desc"],
-    attributesToRetrieve: ["*"],
-  }).catch(() =>
-    meilisearchPost("philgeps", {
-      q: "San Jose del Monte",
-      limit: 1000,
-      attributesToRetrieve: ["*"],
-    })
+  const queries = ["San Jose del Monte", "SJDM", "San José del Monte"];
+
+  const results = await Promise.all(
+    queries.map((q) =>
+      meilisearchPost("philgeps", {
+        q,
+        limit: 1000,
+        sort: ["award_date:desc"],
+        attributesToRetrieve: ["*"],
+      }).catch(() =>
+        meilisearchPost("philgeps", {
+          q,
+          limit: 1000,
+          attributesToRetrieve: ["*"],
+        }).catch(() => ({ hits: [] as Record<string, unknown>[] }))
+      )
+    )
   );
 
-  return data.hits ?? [];
+  const seen = new Set<string>();
+  const deduped: RawPhilGepsHit[] = [];
+  for (const result of results) {
+    for (const hit of result.hits ?? []) {
+      const id = String(
+        hit.reference_id ?? hit.contract_no ?? hit.reference_no ?? hit.id ?? ""
+      );
+      if (id && !seen.has(id)) {
+        seen.add(id);
+        deduped.push(hit);
+      }
+    }
+  }
+  return deduped;
 }

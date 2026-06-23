@@ -26,6 +26,9 @@ export default async function HomePage() {
   const totalDpwhBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   const ongoingProjects = projects.filter((p) => p.status === "On-going").length;
   const activeContracts = contracts.filter((c) => c.status === "Active").length;
+  // PSA 2020 Census population for CSJDM
+  const POPULATION = 651_816;
+  const perCapitaExpenditure = Math.round(latest.expenditure / POPULATION);
 
   return (
     <div>
@@ -46,7 +49,8 @@ export default async function HomePage() {
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-3 leading-tight">
             People&apos;s <span className="text-primary">Budget Portal</span>
           </h1>
-          <p className="text-sm font-medium text-muted-foreground mb-4">City of San Jose del Monte, Bulacan</p>
+          <p className="text-sm font-medium text-muted-foreground mb-1">City of San Jose del Monte, Bulacan</p>
+          <p className="text-base font-semibold text-primary/80 mb-4">Saan napunta ang pera ng bayan?</p>
           <p className="text-muted-foreground text-lg mb-12 max-w-xl">
             Track how CSJDM spends your taxes — budget, contracts, and infrastructure.
             No spin. Just numbers.
@@ -68,6 +72,10 @@ export default async function HomePage() {
             <div className="flex-1 px-6 py-5 text-center">
               <p className="text-2xl font-bold tracking-tight">{formatPeso(latest.drrf)}</p>
               <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">Disaster Fund</p>
+            </div>
+            <div className="flex-1 px-6 py-5 text-center">
+              <p className="text-2xl font-bold tracking-tight">₱{perCapitaExpenditure.toLocaleString()}</p>
+              <p className="text-xs text-muted-foreground mt-1 uppercase tracking-wide">Per Capita (2020 census)</p>
             </div>
           </div>
         </div>
@@ -127,6 +135,30 @@ export default async function HomePage() {
           </div>
         </div>
 
+        {/* About this site */}
+        <div className="bg-muted/50 border rounded-lg p-5">
+          <h2 className="font-semibold text-sm mb-1">About this site</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            This is a citizen-built transparency tool. It is{" "}
+            <strong>not affiliated with the City Government of San Jose del Monte</strong>. Data
+            comes from public sources: BLGF (budget), DPWH (infrastructure), and PhilGEPS
+            (contracts) via{" "}
+            <a
+              href="https://data.bettergov.ph"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              BetterGov.ph
+            </a>
+            . If you spot an error or have new data,{" "}
+            <a href="mailto:policarpiojerome2005@gmail.com" className="underline hover:text-foreground">
+              contact the maintainer
+            </a>
+            .
+          </p>
+        </div>
+
         {/* Nav cards */}
         <div className="grid md:grid-cols-2 gap-4">
           <Link href="/budget">
@@ -136,7 +168,8 @@ export default async function HomePage() {
                   <TrendingUp size={20} className="text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold mb-1">Budget Dashboard</h2>
+                  <h2 className="font-semibold mb-0.5">Budget Dashboard</h2>
+                  <p className="text-xs text-primary/70 font-medium mb-1">Kita at Gastos ng Lungsod</p>
                   <p className="text-sm text-muted-foreground">
                     Annual income vs. expenditure from 2020–{latest.year}. See how much goes to
                     education, disaster preparedness, and public services.
@@ -156,7 +189,8 @@ export default async function HomePage() {
                   <FileText size={20} className="text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold mb-1">Procurement & Contracts</h2>
+                  <h2 className="font-semibold mb-0.5">Procurement & Contracts</h2>
+                  <p className="text-xs text-primary/70 font-medium mb-1">Sino ang Binigyan ng Kontrata?</p>
                   <p className="text-sm text-muted-foreground">
                     {activeContracts} active contracts tracked via PhilGEPS. Who got the money and for
                     what?
@@ -176,7 +210,8 @@ export default async function HomePage() {
                   <Building2 size={20} className="text-primary" />
                 </div>
                 <div>
-                  <h2 className="font-semibold mb-1">DPWH Infrastructure Projects</h2>
+                  <h2 className="font-semibold mb-0.5">DPWH Infrastructure Projects</h2>
+                  <p className="text-xs text-primary/70 font-medium mb-1">Mga Proyektong Imprastraktura</p>
                   <p className="text-sm text-muted-foreground">
                     {ongoingProjects} projects ongoing in CSJDM. Track progress, contractors, and
                     whether they were delivered on time.
@@ -196,7 +231,8 @@ export default async function HomePage() {
                   <AlertTriangle size={20} className="text-amber-600" />
                 </div>
                 <div>
-                  <h2 className="font-semibold mb-1">Accountability Report</h2>
+                  <h2 className="font-semibold mb-0.5">Accountability Report</h2>
+                  <p className="text-xs text-amber-600/80 font-medium mb-1">Ulat ng Pananagutan</p>
                   <p className="text-sm text-muted-foreground">
                     Budget spent on flood control vs. areas still flooding. Water contracts vs. the
                     ongoing water crisis. The gap between spending and reality.
