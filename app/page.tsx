@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, AlertTriangle, TrendingUp, Building2, FileText, Check } from "lucide-react";
+import { ContactTrigger } from "@/components/contact-trigger";
 
 const BUDGET_STEPS = [
   { label: "Executive Prepared", sub: "LGU Budget Office", done: true, active: false },
@@ -243,9 +244,7 @@ export default async function HomePage() {
               BetterGov.ph
             </a>
             . If you spot an error or have new data,{" "}
-            <a href="mailto:policarpiojerome2005@gmail.com" className="underline hover:text-foreground">
-              contact the maintainer
-            </a>
+            <ContactTrigger />
             .
           </p>
         </div>

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
+import { ContactTrigger } from "@/components/contact-trigger";
 import { Analytics } from "@vercel/analytics/next";
 import { ThemeProvider } from "@/components/theme-provider";
 
@@ -43,6 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <abbr title="Department of Public Works and Highways">DPWH</abbr> open data.
               </p>
               <p className="mt-1">&ldquo;Para sa bawat San Joseño&rdquo; — Not affiliated with the City Government of CSJDM.</p>
+              <p className="mt-2"><ContactTrigger /></p>
             </div>
           </footer>
           <Analytics />
