@@ -138,14 +138,14 @@ export function ProjectsList({ projects }: Props) {
   const toggleCategory = (cat: string) =>
     setSelectedCategories((prev) => {
       const next = new Set(prev);
-      next.has(cat) ? next.delete(cat) : next.add(cat);
+      if (next.has(cat)) { next.delete(cat); } else { next.add(cat); }
       return next;
     });
 
   const toggleStatus = (status: string) =>
     setSelectedStatuses((prev) => {
       const next = new Set(prev);
-      next.has(status) ? next.delete(status) : next.add(status);
+      if (next.has(status)) { next.delete(status); } else { next.add(status); }
       return next;
     });
 

@@ -2,8 +2,6 @@ import type { DpwhProject, BudgetYear } from "./types";
 import { categorizeTitle } from "./categorize";
 
 const MEILISEARCH_URL = "https://search2.bettergov.ph/indexes";
-const MEILISEARCH_KEY = process.env.BETTERGOV_MEILISEARCH_KEY;
-if (!MEILISEARCH_KEY) throw new Error("BETTERGOV_MEILISEARCH_KEY environment variable is not set");
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -32,11 +30,13 @@ async function meilisearchPost(
   index: string,
   body: Record<string, unknown>
 ): Promise<{ hits: Record<string, unknown>[] }> {
+  const key = process.env.BETTERGOV_MEILISEARCH_KEY;
+  if (!key) throw new Error("BETTERGOV_MEILISEARCH_KEY environment variable is not set");
   const res = await fetch(`${MEILISEARCH_URL}/${index}/search`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${MEILISEARCH_KEY}`,
+      Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify(body),
     next: { revalidate: 3600 },
