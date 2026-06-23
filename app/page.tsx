@@ -120,31 +120,6 @@ export default async function HomePage() {
       </section>
 
       <div className="max-w-6xl mx-auto px-4 py-10">
-        {/* About this site */}
-        <div className="bg-muted/50 border rounded-lg p-5">
-          <h2 className="font-semibold text-sm mb-1">About this site</h2>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            This is a citizen-built transparency tool. It is{" "}
-            <strong>not affiliated with the City Government of San Jose del Monte</strong>. Data
-            comes from public sources: BLGF (Bureau of Local Government Finance, budget),
-            DPWH (Department of Public Works and Highways, infrastructure), and PhilGEPS
-            (Philippine Government Electronic Procurement System, contracts) via{" "}
-            <a
-              href="https://data.bettergov.ph"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline hover:text-foreground"
-            >
-              BetterGov.ph
-            </a>
-            . If you spot an error or have new data,{" "}
-            <a href="mailto:policarpiojerome2005@gmail.com" className="underline hover:text-foreground">
-              contact the maintainer
-            </a>
-            .
-          </p>
-        </div>
-
         {/* Alert banner */}
         <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
           <AlertTriangle aria-hidden="true" className="text-amber-500 shrink-0 mt-0.5" size={18} />
@@ -248,6 +223,31 @@ export default async function HomePage() {
               </CardContent>
             </Card>
           </Link>
+        </div>
+
+        {/* About this site */}
+        <div className="mt-10 bg-muted/50 border rounded-lg p-5">
+          <h2 className="font-semibold text-sm mb-1">About this site</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
+            This is a citizen-built transparency tool. It is{" "}
+            <strong>not affiliated with the City Government of San Jose del Monte</strong>. Data
+            comes from public sources: BLGF (Bureau of Local Government Finance, budget),
+            DPWH (Department of Public Works and Highways, infrastructure), and PhilGEPS
+            (Philippine Government Electronic Procurement System, contracts) via{" "}
+            <a
+              href="https://data.bettergov.ph"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline hover:text-foreground"
+            >
+              BetterGov.ph
+            </a>
+            . If you spot an error or have new data,{" "}
+            <a href="mailto:policarpiojerome2005@gmail.com" className="underline hover:text-foreground">
+              contact the maintainer
+            </a>
+            .
+          </p>
         </div>
       </div>
     </div>
