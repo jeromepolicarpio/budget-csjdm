@@ -1,9 +1,9 @@
 ﻿import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Plus_Jakarta_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
   title: "City of San Jose del Monte | People's Budget Portal",
