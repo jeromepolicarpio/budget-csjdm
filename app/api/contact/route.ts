@@ -22,16 +22,10 @@ export async function POST(req: NextRequest) {
     typeof message !== "string" ||
     message.trim().length < 5
   ) {
-    console.error("[contact] 422 — fields:", {
-      emailOk: typeof email === "string" && email.includes("@"),
-      reasonOk: isValidReason(reason),
-      reason,
-      messageOk: typeof message === "string" && (message as string).trim().length >= 5,
-      messageLength: typeof message === "string" ? (message as string).trim().length : null,
-    });
     return NextResponse.json({ error: "Invalid fields" }, { status: 422 });
   }
 
+  // Strip BOM and whitespace — Windows clipboard can prepend U+FEFF invisibly
   const apiKey = process.env.RESEND_API_KEY?.replace(/^﻿/, "").trim();
 
   if (!apiKey) {
@@ -49,19 +43,19 @@ export async function POST(req: NextRequest) {
       body: JSON.stringify({
         from: "CSJDM Budget Portal <onboarding@resend.dev>",
         to: ["policarpiojerome2005@gmail.com"],
-        reply_to: [email],
+        reply_to: email,
         subject: `[CSJDM Budget] ${reason} - from ${email}`,
         text: `Reason: ${reason}\nFrom: ${email}\n\n${message.trim()}`,
       }),
     });
 
     if (!res.ok) {
-      const body = await res.text();
-      console.error("[contact] Resend API error:", res.status, body);
+      const errorBody = await res.text();
+      console.error("[contact] Resend API error:", res.status, errorBody);
       return NextResponse.json({ error: "Failed to send" }, { status: 500 });
     }
   } catch (err) {
-    const msg = err instanceof Error ? `${err.name}: ${err.message}\n${err.stack}` : String(err);
+    const msg = err instanceof Error ? `${err.name}: ${err.message}` : String(err);
     console.error("[contact] fetch threw:", msg);
     return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   }
