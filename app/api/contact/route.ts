@@ -59,7 +59,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Failed to send" }, { status: 500 });
     }
   } catch (err) {
-    console.error("[contact] fetch threw:", err instanceof Error ? err.message : String(err));
+    const msg = err instanceof Error ? `${err.name}: ${err.message}\n${err.stack}` : String(err);
+    console.error("[contact] fetch threw:", msg);
     return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   }
 
