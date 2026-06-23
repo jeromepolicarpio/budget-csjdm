@@ -64,7 +64,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
         <DialogHeader>
           <DialogTitle>Got a tip or correction?</DialogTitle>
           <DialogDescription>
-            Found wrong data, something missing, or have a suggestion? I read every message.
+            Spotted an error or have a suggestion? I read every message.
           </DialogDescription>
         </DialogHeader>
 
@@ -77,8 +77,8 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
             </Button>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-4 pt-1">
-            <div className="space-y-2">
+          <form onSubmit={handleSubmit} className="space-y-5 pt-2">
+            <div className="space-y-[15px]">
               <label className="text-sm font-medium" htmlFor="contact-email">
                 Your email
               </label>
@@ -89,11 +89,11 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                className="w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring"
               />
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-[15px]">
               <label className="text-sm font-medium" htmlFor="contact-reason">
                 Reason
               </label>
@@ -111,7 +111,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
               </Select>
             </div>
 
-            <div className="space-y-2">
+            <div className="space-y-[15px]">
               <label className="text-sm font-medium" htmlFor="contact-message">
                 Message
               </label>
@@ -122,7 +122,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
                 placeholder="Describe the issue or suggestion..."
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                className="w-full rounded-md border bg-background px-3 py-2 text-sm outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+                className="w-full rounded-md border bg-transparent px-3 py-2 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"
               />
             </div>
 
@@ -130,7 +130,7 @@ export function ContactModal({ open, onOpenChange }: ContactModalProps) {
               <p className="text-xs text-destructive">Failed to send — check your connection and try again.</p>
             )}
 
-            <div className="flex justify-end gap-2 pt-1">
+            <div className="flex justify-end gap-3 pt-5">
               <Button type="button" variant="outline" onClick={() => handleOpenChange(false)}>
                 Cancel
               </Button>
