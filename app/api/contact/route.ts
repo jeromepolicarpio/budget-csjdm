@@ -26,6 +26,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid fields" }, { status: 422 });
   }
 
+  if (!process.env.RESEND_API_KEY) {
+    console.error("[contact] RESEND_API_KEY is not set");
+    return NextResponse.json({ error: "Email service not configured" }, { status: 503 });
+  }
+
   const resend = new Resend(process.env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
     from: "CSJDM Budget Portal <onboarding@resend.dev>",
@@ -36,6 +41,7 @@ export async function POST(req: NextRequest) {
   });
 
   if (error) {
+    console.error("[contact] Resend error:", error);
     return NextResponse.json({ error: "Failed to send" }, { status: 500 });
   }
 
