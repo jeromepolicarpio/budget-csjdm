@@ -86,8 +86,39 @@ export default async function HomePage() {
           <p className="text-sm font-medium text-muted-foreground mb-4">
             {latest.year} Budget Process
           </p>
-          <div className="relative">
-          <div className="flex items-center overflow-x-auto py-2">
+          {/* Mobile: 2×2 grid */}
+          <div className="sm:hidden grid grid-cols-2 gap-2">
+            {BUDGET_STEPS.map((step) => (
+              <div
+                key={step.label}
+                className="flex items-center gap-2.5 p-3 rounded-lg bg-background border"
+                {...(step.active ? { "aria-current": "step" } : {})}
+              >
+                <div className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${
+                  step.active
+                    ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                    : step.done
+                    ? "bg-primary/20 text-primary"
+                    : "bg-muted border-2 border-border"
+                }`}>
+                  {(step.done || step.active) && (
+                    <Check size={13} className={step.active ? "text-primary-foreground" : "text-primary"} />
+                  )}
+                </div>
+                <div className="min-w-0">
+                  <p className={`text-xs font-semibold leading-tight ${
+                    step.active ? "text-primary" : step.done ? "text-foreground" : "text-muted-foreground"
+                  }`}>
+                    {step.label}
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-0.5 leading-tight">{step.sub}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop: horizontal timeline */}
+          <div className="hidden sm:flex items-center py-2">
             {BUDGET_STEPS.map((step, i) => (
               <div key={step.label} className="flex items-center min-w-0 flex-1 last:flex-none" {...(step.active ? { "aria-current": "step" } : {})}>
                 <div className="flex flex-col items-center text-center min-w-[110px]">
@@ -114,8 +145,6 @@ export default async function HomePage() {
                 )}
               </div>
             ))}
-          </div>
-          <div className="pointer-events-none absolute inset-y-0 right-0 w-12 bg-gradient-to-l from-muted/60 to-transparent sm:hidden" aria-hidden="true" />
           </div>
         </div>
       </section>
