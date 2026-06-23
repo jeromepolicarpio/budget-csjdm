@@ -31,6 +31,14 @@ export function Navbar() {
   }, [open]);
 
   return (
+    <>
+    {open && (
+      <div
+        className="sm:hidden fixed inset-0 z-40 bg-background/60 backdrop-blur-sm animate-in fade-in duration-150"
+        onClick={() => setOpen(false)}
+        aria-hidden="true"
+      />
+    )}
     <header className="border-b sticky top-0 z-50 bg-background/95 backdrop-blur">
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
@@ -74,16 +82,25 @@ export function Navbar() {
           </button>
         </nav>
 
-        {/* Mobile hamburger */}
-        <button
-          className="sm:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-          onClick={() => setOpen((v) => !v)}
-          aria-expanded={open}
-          aria-controls="mobile-menu"
-          aria-label={open ? "Close menu" : "Open menu"}
-        >
-          {open ? <X size={20} /> : <Menu size={20} />}
-        </button>
+        {/* Mobile controls */}
+        <div className="sm:hidden flex items-center gap-1">
+          <button
+            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+          </button>
+          <button
+            className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            onClick={() => setOpen((v) => !v)}
+            aria-expanded={open}
+            aria-controls="mobile-menu"
+            aria-label={open ? "Close menu" : "Open menu"}
+          >
+            {open ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile dropdown */}
@@ -110,5 +127,6 @@ export function Navbar() {
         </div>
       )}
     </header>
+    </>
   );
 }
