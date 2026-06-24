@@ -73,28 +73,45 @@ function normalizePhilGepsHit(hit: Record<string, unknown>): Contract | null {
 
 
 export async function getContracts(): Promise<Contract[]> {
-  const liveHits = await fetchLivePhilGeps();
-  if (liveHits.length > 0) {
-    return liveHits
+  // null = API threw; [] = API returned genuinely empty
+  let liveHits: ReturnType<typeof normalizePhilGepsHit>[] | null = null;
+  try {
+    const hits = await fetchLivePhilGeps();
+    liveHits = hits
       .map(normalizePhilGepsHit)
       .filter((c): c is Contract => c !== null && c.amount > 0)
       .sort((a, b) => b.date.localeCompare(a.date));
+  } catch {
+    // API unavailable — fall through to Neon
   }
+
+  if (liveHits && liveHits.length > 0) return liveHits;
 
   const rows = await db
     .select()
     .from(contracts)
     .orderBy(desc(contracts.date));
 
-  return rows.map((r) => ({
-    id: r.id,
-    title: r.title,
-    awardee: r.awardee,
-    amount: r.amount,
-    category: r.category,
-    date: r.date,
-    status: r.status as Contract["status"],
-  }));
+  if (rows.length > 0) {
+    return rows.map((r) => ({
+      id: r.id,
+      title: r.title,
+      awardee: r.awardee,
+      amount: r.amount,
+      category: r.category,
+      date: r.date,
+      status: r.status as Contract["status"],
+    }));
+  }
+
+  // Both API and Neon came up empty. If the API actually errored (not just
+  // returned zero results), throw so Next.js ISR retains the last good cache
+  // rather than overwriting it with a blank page.
+  if (liveHits === null) {
+    throw new Error("Contract data unavailable — BetterGov down and Neon empty");
+  }
+
+  return [];
 }
 
 // ── DPWH projects ─────────────────────────────────────────────────────────
