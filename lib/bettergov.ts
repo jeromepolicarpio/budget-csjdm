@@ -153,27 +153,44 @@ export type RawPhilGepsHit = Record<string, unknown>;
 
 export async function fetchLivePhilGeps(): Promise<RawPhilGepsHit[]> {
   const queries = ["San Jose del Monte", "SJDM", "San José del Monte"];
+  const offsets = [0, 1000];
 
-  const results = await Promise.all(
-    queries.map((q) =>
+  // Fetch 2 pages per query (6 requests total) to get beyond the 1000-hit limit.
+  // Each individual request falls back to unsorted if the index rejects the sort field.
+  // null = both attempts failed for that page.
+  const requests = queries.flatMap((q) =>
+    offsets.map((offset) =>
       meilisearchPost("philgeps", {
         q,
         limit: 1000,
+        offset,
         sort: ["award_date:desc"],
         attributesToRetrieve: ["*"],
       }).catch(() =>
         meilisearchPost("philgeps", {
           q,
           limit: 1000,
+          offset,
           attributesToRetrieve: ["*"],
-        }).catch(() => ({ hits: [] as Record<string, unknown>[] }))
+        }).catch(() => null)
       )
     )
   );
 
+  const rawResults = await Promise.all(requests);
+  const succeeded = rawResults.filter(
+    (r): r is { hits: Record<string, unknown>[] } => r !== null
+  );
+
+  // If every single request failed, throw so Next.js ISR keeps the last good
+  // cache instead of overwriting it with an empty render.
+  if (succeeded.length === 0) {
+    throw new Error("BetterGov PhilGEPS unavailable — all requests failed");
+  }
+
   const seen = new Set<string>();
   const deduped: RawPhilGepsHit[] = [];
-  for (const result of results) {
+  for (const result of succeeded) {
     for (const hit of result.hits ?? []) {
       const id = String(
         hit.reference_id ?? hit.contract_no ?? hit.reference_no ?? hit.id ?? ""

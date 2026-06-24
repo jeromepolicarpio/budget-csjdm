@@ -73,7 +73,7 @@ function normalizePhilGepsHit(hit: Record<string, unknown>): Contract | null {
 
 
 export async function getContracts(): Promise<Contract[]> {
-  const liveHits = await fetchLivePhilGeps().catch(() => []);
+  const liveHits = await fetchLivePhilGeps();
   if (liveHits.length > 0) {
     return liveHits
       .map(normalizePhilGepsHit)
