@@ -3,15 +3,21 @@ export const revalidate = 3600;
 import { getBudgetYears, getDpwhProjects, getContracts } from "@/lib/queries";
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import type { Contract, DpwhProject } from "@/lib/types";
 
 type FindingType = "critical" | "warn" | "ok";
+
+type Source = {
+  label: string;
+  url: string;
+};
 
 type Finding = {
   type: FindingType;
   title: string;
   detail: string;
+  sources?: Source[];
   relatedContracts?: Contract[];
   relatedProjects?: DpwhProject[];
 };
@@ -34,7 +40,6 @@ export default async function AccountabilityPage() {
 
   const waterContractsList = contracts.filter((c) => c.category === "Water & Utilities");
   const floodProjectsList = projects.filter((p) => p.category === "Flood Control");
-  // PhilGEPS reference ID for the CSJDM Sports Complex contract (awarded 2020)
   const sportsContract = contracts.filter((c) => c.id === "20CD0147");
 
   const floodSince = floodProjectsList.reduce(
@@ -53,30 +58,51 @@ export default async function AccountabilityPage() {
   const findings: Finding[] = [
     {
       type: "critical",
-      title: "Water Crisis vs. Water Spending",
-      detail: `The city awarded ${formatPeso(waterContracts)} in water & utility contracts, yet 250,000 residents (≈36% of the population) are without reliable water supply as of 2025 after PrimeWater's contract was terminated. Where did the money go?`,
+      title: "Water Crisis: ₱2B Capex Promised, 1% Delivered",
+      detail: `PrimeWater committed a ₱2 billion capital expenditure program under its joint venture with the city water district — but utilized only 1% of it. The deal was pre-terminated in April 2025 and officially ended in November 2025. Today, 47,611 households (≈250,000 residents, nearly a third of the city) still lack reliable piped water. As a stopgap, the city spends an estimated ₱370 million every year running 22 water tankers across all 62 barangays, 24/7. Meanwhile, the water district awarded ${formatPeso(waterContracts)} in water & utility contracts throughout PrimeWater's tenure.`,
+      sources: [
+        { label: "Manila Times — Termination", url: "https://www.manilatimes.net/2025/11/06/regions/san-jose-del-monte-ends-primewater-deal/2216174" },
+        { label: "Rappler — LGU Takes Control", url: "https://www.rappler.com/philippines/san-jose-del-monte-bulacan-takeover-water-district-primewater/" },
+        { label: "PNA — Pre-termination Move", url: "https://www.pna.gov.ph/articles/1248873" },
+        { label: "Inquirer — Residents' Account", url: "https://opinion.inquirer.net/191183/san-jose-del-monte-city-drowning-in-promises-residents-left-gasping-for-potable-water" },
+      ],
       relatedContracts: waterContractsList,
     },
     {
       type: "critical",
       title: `Flooding Persists Despite ${formatPeso(floodBudget)} in Flood Projects`,
-      detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since ${floodSinceYear}. In June 2025, 22 barangays were still inundated — residents in low-lying barangays reported waist-deep flooding within hours of heavy rain.${evacDetail}`,
+      detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since ${floodSinceYear}. On June 6, 2025, a single habagat event inundated 22 barangays — floodwaters rose neck-deep in Barangay San Rafael I within 45 minutes, overflowing a creek and damaging a bridge railing.${evacDetail}`,
+      sources: [
+        { label: "The Watchers — June 6 flooding", url: "https://watchers.news/2025/06/10/severe-flooding-san-jose-del-monte-metro-manila-philippines/" },
+        { label: "GMA News", url: "https://www.gmanetwork.com/regionaltv/news/108529/heavy-floods-hit-san-jose-del-monte-bulacan/story/" },
+        { label: "Manila Standard — NDRRMC", url: "https://manilastandard.net/lgu/314600289/flood-hits-13-areas-in-san-jose-del-monte-amid-heavy-rains-ndrrmc.html" },
+      ],
       relatedProjects: floodProjectsList,
     },
     {
       type: "warn",
-      title: `${formatPeso(drrfTotal)} in DRRF Collected — But Was It Spent?`,
-      detail: `CSJDM has collected an estimated ${formatPeso(drrfTotal)} in Disaster Risk Reduction Funds from 2020–${latest.year}. The law mandates this be spent on disaster preparedness. No public accounting of DRRF expenditure has been published by the city.`,
+      title: `${formatPeso(drrfTotal)} in LDRRMF Collected — No Public Accounting`,
+      detail: `CSJDM has collected an estimated ${formatPeso(drrfTotal)} in Local Disaster Risk Reduction and Management Funds (LDRRMF) from 2020–${latest.year}. RA 10121 mandates this be spent on disaster preparedness and mitigation. The city's Full Disclosure Policy page lists the required LDRRMF utilization report, but no COA-audited summary of how these funds were actually spent has been published publicly.`,
+      sources: [
+        { label: "CSJDM — LDRRMF Utilization (Full Disclosure)", url: "https://csjdm.gov.ph/full-disclosure-policy/report-of-local-disaster-risk-reduction-and-management-fund-ldrrmf-utilization/" },
+        { label: "COA — LDRRMF Audit Reports", url: "https://www.coa.gov.ph/index.php/reports/citizen-participatory-audit-reports/category/6570-local-disaster-risk-reduction-and-management-fund-ldrrmf" },
+      ],
     },
     {
       type: "warn",
-      title: "Budget Surplus Every Year — But Services Are Failing",
-      detail: `CSJDM has posted a budget surplus every year from 2020–${latest.year} (${formatPeso(latest.income - latest.expenditure)} in ${latest.year} alone). If the city consistently underspends, why are basic services like water and flood control still failing?`,
+      title: "Budget Surplus Every Year — But Basic Services Are Failing",
+      detail: `CSJDM has posted a budget surplus every year from 2020–${latest.year} (${formatPeso(latest.income - latest.expenditure)} unspent in ${latest.year} alone). If the city consistently underspends its budget, why are water supply and flood control — both funded for years — still failing residents? Underspending on capital projects while outsourcing services that fail is a pattern worth scrutinizing.`,
+      sources: [
+        { label: "BLGF — LGU Fiscal Data", url: "https://blgf.gov.ph/lgu-fiscal-data/" },
+      ],
     },
     {
       type: "ok",
       title: "Sports Complex Delivered On Time",
       detail: `The San Jose del Monte Sports Complex (Contract 20CD0147, ${formatPeso(14_106_670)}) was completed in 2021 as contracted. At least one project was delivered as promised.`,
+      sources: [
+        { label: "PhilGEPS — Award Notice", url: "https://www.philgeps.gov.ph/" },
+      ],
       relatedContracts: sportsContract.length > 0 ? sportsContract : undefined,
     },
   ];
@@ -88,21 +114,27 @@ export default async function AccountabilityPage() {
   };
 
   const bgColors: Record<FindingType, string> = {
-    critical: "border-red-200 bg-red-50",
-    warn: "border-amber-200 bg-amber-50",
-    ok: "border-green-200 bg-green-50",
+    critical: "border-red-200 bg-red-50 dark:border-red-900 dark:bg-red-950/30",
+    warn: "border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/30",
+    ok: "border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950/30",
   };
 
   const textColors: Record<FindingType, string> = {
-    critical: "text-red-900",
-    warn: "text-amber-900",
-    ok: "text-green-900",
+    critical: "text-red-900 dark:text-red-200",
+    warn: "text-amber-900 dark:text-amber-200",
+    ok: "text-green-900 dark:text-green-200",
   };
 
   const detailColors: Record<FindingType, string> = {
-    critical: "text-red-800",
-    warn: "text-amber-800",
-    ok: "text-green-800",
+    critical: "text-red-800 dark:text-red-300",
+    warn: "text-amber-800 dark:text-amber-300",
+    ok: "text-green-800 dark:text-green-300",
+  };
+
+  const sourceColors: Record<FindingType, string> = {
+    critical: "text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-200",
+    warn: "text-amber-600 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-200",
+    ok: "text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-200",
   };
 
   return (
@@ -111,7 +143,7 @@ export default async function AccountabilityPage() {
         <h1 className="text-3xl font-bold tracking-tight mb-2">Accountability Report</h1>
         <p className="text-muted-foreground">
           Cross-referencing CSJDM budget data, DPWH projects, and PhilGEPS contracts against what
-          residents are actually experiencing on the ground.
+          residents are actually experiencing on the ground. All findings are sourced and linkable.
         </p>
       </div>
 
@@ -139,8 +171,27 @@ export default async function AccountabilityPage() {
               <div className="flex-1">
                 <p className={`font-semibold mb-1 ${textColors[f.type]}`}>{f.title}</p>
                 <p className={`text-sm leading-relaxed ${detailColors[f.type]}`}>{f.detail}</p>
+
+                {f.sources && f.sources.length > 0 && (
+                  <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-3">
+                    <span className={`text-xs font-medium ${detailColors[f.type]}`}>Sources:</span>
+                    {f.sources.map((s) => (
+                      <a
+                        key={s.url}
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`text-xs inline-flex items-center gap-0.5 underline underline-offset-2 ${sourceColors[f.type]}`}
+                      >
+                        {s.label}
+                        <ExternalLink size={10} />
+                      </a>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
+
             {(f.relatedContracts || f.relatedProjects) && (
               <details className="mt-3 ml-8">
                 <summary className={`text-xs font-medium cursor-pointer select-none hover:underline ${detailColors[f.type]}`}>
@@ -150,13 +201,13 @@ export default async function AccountabilityPage() {
                 </summary>
                 <div className="mt-2 space-y-1">
                   {f.relatedContracts?.map((c) => (
-                    <div key={c.id} className="flex justify-between text-xs py-1 border-b border-black/10 last:border-0 gap-3">
+                    <div key={c.id} className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3">
                       <span className={`truncate ${detailColors[f.type]}`}>{c.title}</span>
                       <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(c.amount)}</span>
                     </div>
                   ))}
                   {f.relatedProjects?.map((p) => (
-                    <div key={p.contractId} className="flex justify-between text-xs py-1 border-b border-black/10 last:border-0 gap-3">
+                    <div key={p.contractId} className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3">
                       <span className={`truncate ${detailColors[f.type]}`}>{p.description}</span>
                       <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(p.budget)}</span>
                     </div>
@@ -174,24 +225,26 @@ export default async function AccountabilityPage() {
         </CardHeader>
         <CardContent className="space-y-3 text-sm">
           {[
-            ["Residents without reliable water", "250,000+"],
-            ["Barangays flooded in June 2025", "22"],
-            ["DPWH flood control budget (2020–2024)", formatPeso(floodBudget)],
-            ["DRRF collected (2020–2024)", formatPeso(drrfTotal)],
+            ["Residents without reliable piped water", "≈250,000 (47,611 households)"],
+            ["City's annual water tanker cost (stopgap)", "≈₱370,000,000"],
+            ["Barangays flooded — June 6, 2025", "22"],
+            [`DPWH flood control budget (since ${floodSinceYear})`, formatPeso(floodBudget)],
+            [`LDRRMF collected (2020–${latest.year})`, formatPeso(drrfTotal)],
             [`${latest.year} budget surplus (unspent)`, formatPeso(latest.income - latest.expenditure)],
-            ["Water contracts awarded", formatPeso(waterContracts)],
+            ["Water & utility contracts awarded", formatPeso(waterContracts)],
           ].map(([label, value]) => (
             <div key={label} className="flex justify-between border-b pb-3 last:border-0 last:pb-0">
               <span className="text-muted-foreground">{label}</span>
-              <span className="font-semibold">{value}</span>
+              <span className="font-semibold text-right">{value}</span>
             </div>
           ))}
         </CardContent>
       </Card>
 
       <p className="text-xs text-muted-foreground mt-6">
-        Data sources: BLGF LGU Fiscal Data, DPWH Infrastructure Dataset, PhilGEPS, DROMIC flood
-        incident reports, and news reports (Inquirer, GMA, The Watchers).
+        Data sources: BLGF LGU Fiscal Data, DPWH Infrastructure Dataset, PhilGEPS, NDRRMC/DROMIC
+        incident reports, and news reports (Manila Times, Rappler, GMA News, The Watchers, Inquirer, PNA).
+        Numbers are computed from live database records; narratives are sourced and linked above.
       </p>
     </div>
   );
