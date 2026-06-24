@@ -39,7 +39,7 @@ async function meilisearchPost(
       Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify(body),
-    next: { revalidate: 3600 },
+    cache: "no-store",
   });
   if (!res.ok) throw new Error(`BetterGov ${index} ${res.status}`);
   return res.json() as Promise<{ hits: Record<string, unknown>[] }>;
