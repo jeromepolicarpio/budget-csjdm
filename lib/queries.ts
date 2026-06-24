@@ -81,13 +81,11 @@ export async function getContracts(): Promise<Contract[]> {
       .map(normalizePhilGepsHit)
       .filter((c): c is Contract => c !== null && c.amount > 0)
       .sort((a, b) => b.date.localeCompare(a.date));
-  } catch (err) {
-    console.error("[getContracts] fetchLivePhilGeps threw, falling to Neon:", err);
+  } catch {
+    // API failed — fall through to Neon
   }
 
   if (liveHits && liveHits.length > 0) return liveHits;
-
-  console.log(`[getContracts] liveHits=${liveHits?.length ?? "null"}, querying Neon fallback`);
 
   const rows = await db
     .select()

@@ -39,7 +39,7 @@ async function meilisearchPost(
       Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify(body),
-    cache: "no-store",
+    next: { revalidate: 3600 },
   });
   if (!res.ok) throw new Error(`BetterGov ${index} ${res.status}`);
   return res.json() as Promise<{ hits: Record<string, unknown>[] }>;
@@ -166,18 +166,14 @@ export async function fetchLivePhilGeps(): Promise<RawPhilGepsHit[]> {
         offset,
         sort: ["award_date:desc"],
         attributesToRetrieve: ["*"],
-      }).catch((err: unknown) => {
-        console.error(`[PhilGEPS] sorted fetch failed q="${q}" offset=${offset}:`, err);
-        return meilisearchPost("philgeps", {
+      }).catch(() =>
+        meilisearchPost("philgeps", {
           q,
           limit: 1000,
           offset,
           attributesToRetrieve: ["*"],
-        }).catch((err2: unknown) => {
-          console.error(`[PhilGEPS] unsorted fetch also failed q="${q}" offset=${offset}:`, err2);
-          return null;
-        });
-      })
+        }).catch(() => null)
+      )
     )
   );
 
@@ -185,8 +181,6 @@ export async function fetchLivePhilGeps(): Promise<RawPhilGepsHit[]> {
   const succeeded = rawResults.filter(
     (r): r is { hits: Record<string, unknown>[] } => r !== null
   );
-
-  console.log(`[PhilGEPS] ${succeeded.length}/${rawResults.length} requests succeeded, total hits: ${succeeded.reduce((s, r) => s + (r.hits?.length ?? 0), 0)}`);
 
   // If every single request failed, throw so Next.js ISR keeps the last good
   // cache instead of overwriting it with an empty render.
