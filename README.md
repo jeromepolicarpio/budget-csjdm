@@ -4,7 +4,7 @@
 
 A civic transparency tracker for **City of San Jose del Monte, Bulacan**. Follow where the money goes — annual budget, government contracts, and DPWH infrastructure projects — sourced entirely from Philippine open data portals.
 
-**Live:** [budget-csjdm.vercel.app](https://budget-csjdm.vercel.app)
+**Live:** [csjdm-budget.vercel.app](https://csjdm-budget.vercel.app)
 
 ---
 
