@@ -74,7 +74,7 @@ function normalizePhilGepsHit(hit: Record<string, unknown>): Contract | null {
 
 export async function getContracts(): Promise<Contract[]> {
   // null = API threw; [] = API returned genuinely empty
-  let liveHits: ReturnType<typeof normalizePhilGepsHit>[] | null = null;
+  let liveHits: Contract[] | null = null;
   try {
     const hits = await fetchLivePhilGeps();
     liveHits = hits
