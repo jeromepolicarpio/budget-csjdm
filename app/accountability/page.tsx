@@ -3,6 +3,7 @@ export const revalidate = 3600;
 import { getBudgetYears, getDpwhProjects, getContracts } from "@/lib/queries";
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
 import { AlertTriangle, CheckCircle, XCircle, ExternalLink } from "lucide-react";
 import type { Contract, DpwhProject } from "@/lib/types";
 
@@ -201,16 +202,24 @@ export default async function AccountabilityPage() {
                 </summary>
                 <div className="mt-2 space-y-1">
                   {f.relatedContracts?.map((c) => (
-                    <div key={c.id} className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3">
+                    <Link
+                      key={c.id}
+                      href={`/procurement/${encodeURIComponent(c.id)}/source`}
+                      className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3 hover:opacity-70 transition-opacity"
+                    >
                       <span className={`truncate ${detailColors[f.type]}`}>{c.title}</span>
                       <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(c.amount)}</span>
-                    </div>
+                    </Link>
                   ))}
                   {f.relatedProjects?.map((p) => (
-                    <div key={p.contractId} className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3">
+                    <Link
+                      key={p.contractId}
+                      href={`/projects/${encodeURIComponent(p.contractId)}/source`}
+                      className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3 hover:opacity-70 transition-opacity"
+                    >
                       <span className={`truncate ${detailColors[f.type]}`}>{p.description}</span>
                       <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(p.budget)}</span>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </details>
