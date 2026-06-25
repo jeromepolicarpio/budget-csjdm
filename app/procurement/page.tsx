@@ -66,7 +66,16 @@ export default async function ProcurementPage() {
 
       <ProcurementTable contracts={contracts} />
       <p className="text-xs text-muted-foreground mt-3">
-        Source: <abbr title="Philippine Government Electronic Procurement System">PhilGEPS</abbr> contract awards.
+        Source:{" "}
+        <a
+          href="https://www.philgeps.gov.ph/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          PhilGEPS (Philippine Government Electronic Procurement System)
+        </a>
+        . Click any reference number in the table to view its source details and verification steps.
       </p>
     </div>
   );

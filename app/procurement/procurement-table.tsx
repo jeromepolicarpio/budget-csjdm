@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useMemo, useEffect, useRef } from "react";
+import Link from "next/link";
 import type { Contract } from "@/lib/types";
 import { formatPeso } from "@/lib/data";
-import { X } from "lucide-react";
+import { X, ExternalLink } from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -206,6 +207,12 @@ export function ProcurementTable({ contracts }: Props) {
           paginated.map((c, i) => (
             <div key={`${viewKey}-${i}`} className="border rounded-lg p-4 space-y-2">
               <p className="font-medium leading-snug text-sm">{c.title}</p>
+              <Link
+                href={`/procurement/${encodeURIComponent(c.id)}/source`}
+                className="text-xs text-primary font-mono hover:underline underline-offset-2 inline-flex items-center gap-0.5"
+              >
+                Ref: {c.id} <ExternalLink size={10} />
+              </Link>
               <p className="text-xs text-muted-foreground">{c.awardee}</p>
               <div className="flex flex-wrap items-center gap-2 pt-1">
                 <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${CATEGORY_COLORS[c.category] ?? "bg-muted text-muted-foreground"}`}>
@@ -228,16 +235,18 @@ export function ProcurementTable({ contracts }: Props) {
       <div className="hidden md:block rounded-lg border overflow-x-auto">
         <table className="w-full table-fixed text-sm">
           <colgroup>
-            <col style={{ width: "32%" }} />
-            <col style={{ width: "23%" }} />
-            <col style={{ width: "15%" }} />
-            <col style={{ width: "14%" }} />
+            <col style={{ width: "28%" }} />
+            <col style={{ width: "10%" }} />
+            <col style={{ width: "20%" }} />
+            <col style={{ width: "13%" }} />
+            <col style={{ width: "13%" }} />
             <col style={{ width: "9%" }} />
             <col style={{ width: "7%" }} />
           </colgroup>
           <thead className="bg-muted">
             <tr>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Title</th>
+              <th className="px-4 py-3 text-left font-medium text-muted-foreground">Ref No.</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Awardee</th>
               <th className="px-4 py-3 text-left font-medium text-muted-foreground">Category</th>
               <th
@@ -268,7 +277,7 @@ export function ProcurementTable({ contracts }: Props) {
           <tbody>
             {paginated.length === 0 ? (
               <tr>
-                <td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                   No contracts match the current filters.
                 </td>
               </tr>
@@ -276,11 +285,20 @@ export function ProcurementTable({ contracts }: Props) {
               paginated.map((c, i) => (
                 <tr
                   key={`${viewKey}-${i}`}
-                  title={`Contract ID: ${c.id}`}
                   className="border-t hover:bg-muted/50 transition-colors"
                 >
                   <td className="px-4 py-3">
                     <p className="font-medium leading-snug">{c.title}</p>
+                  </td>
+                  <td className="px-4 py-3">
+                    <Link
+                      href={`/procurement/${encodeURIComponent(c.id)}/source`}
+                      className="font-mono text-xs text-primary hover:underline underline-offset-2 inline-flex items-center gap-0.5"
+                      title="View source details for this contract"
+                    >
+                      {c.id}
+                      <ExternalLink size={10} />
+                    </Link>
                   </td>
                   <td className="px-4 py-3 text-muted-foreground truncate" title={c.awardee}>
                     {c.awardee}

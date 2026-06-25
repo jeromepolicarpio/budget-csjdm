@@ -3,7 +3,8 @@
 import { useState, useMemo } from "react";
 import type { DpwhProject } from "@/lib/types";
 import { formatPeso } from "@/lib/data";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 const STATUS_COLORS: Record<string, string> = {
   Completed: "bg-green-100 text-green-800",
@@ -46,7 +47,15 @@ function ProjectCard({ project: p }: { project: DpwhProject }) {
           </button>
           {expanded && (
             <p className="text-xs text-muted-foreground mt-1">
-              Contract ID: {p.contractId} · {p.infraYear} · {p.sourceOfFunds}
+              Contract ID:{" "}
+              <Link
+                href={`/projects/${encodeURIComponent(p.contractId)}/source`}
+                className="font-mono text-primary underline underline-offset-2 hover:opacity-80 transition-opacity inline-flex items-center gap-0.5"
+              >
+                {p.contractId}
+                <ExternalLink size={10} />
+              </Link>
+              {" "}· {p.infraYear} · {p.sourceOfFunds}
             </p>
           )}
         </div>
@@ -120,10 +129,13 @@ function ProjectCard({ project: p }: { project: DpwhProject }) {
   );
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export function ProjectsList({ projects }: Props) {
   const [query, setQuery] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set());
   const [selectedStatuses, setSelectedStatuses] = useState<Set<string>>(new Set());
+  const [page, setPage] = useState(1);
 
   const categories = useMemo(
     () => [...new Set(projects.map((p) => p.category))].sort(),
@@ -135,19 +147,23 @@ export function ProjectsList({ projects }: Props) {
     [projects]
   );
 
-  const toggleCategory = (cat: string) =>
+  const toggleCategory = (cat: string) => {
     setSelectedCategories((prev) => {
       const next = new Set(prev);
       if (next.has(cat)) { next.delete(cat); } else { next.add(cat); }
       return next;
     });
+    setPage(1);
+  };
 
-  const toggleStatus = (status: string) =>
+  const toggleStatus = (status: string) => {
     setSelectedStatuses((prev) => {
       const next = new Set(prev);
       if (next.has(status)) { next.delete(status); } else { next.add(status); }
       return next;
     });
+    setPage(1);
+  };
 
   const filtered = useMemo(() => {
     let result = projects;
@@ -163,6 +179,12 @@ export function ProjectsList({ projects }: Props) {
     }
     return result;
   }, [projects, query, selectedCategories, selectedStatuses]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / ITEMS_PER_PAGE));
+  const safePage = Math.min(page, totalPages);
+  const paginated = filtered.slice((safePage - 1) * ITEMS_PER_PAGE, safePage * ITEMS_PER_PAGE);
+  const start = filtered.length === 0 ? 0 : (safePage - 1) * ITEMS_PER_PAGE + 1;
+  const end = Math.min(safePage * ITEMS_PER_PAGE, filtered.length);
 
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -240,7 +262,7 @@ export function ProjectsList({ projects }: Props) {
         type="text"
         placeholder="Search projects..."
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         className="w-full px-3 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-ring"
       />
 
@@ -279,17 +301,43 @@ export function ProjectsList({ projects }: Props) {
       </div>
 
       <div className="space-y-3">
-        {filtered.length === 0 ? (
+        {paginated.length === 0 ? (
           <div className="border rounded-lg p-8 text-center text-muted-foreground text-sm">
             No projects match the current filters.
           </div>
         ) : (
-          filtered.map((p) => <ProjectCard key={p.contractId} project={p} />)
+          paginated.map((p) => <ProjectCard key={p.contractId} project={p} />)
         )}
       </div>
-      <p className="text-xs text-muted-foreground">
-        Showing {filtered.length} of {projects.length} projects
-      </p>
+
+      <div className="flex items-center justify-between pt-1">
+        <p className="text-xs text-muted-foreground">
+          {filtered.length === 0
+            ? "No results"
+            : `Showing ${start}–${end} of ${filtered.length} projects`}
+        </p>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="px-3 py-1.5 rounded-md text-xs font-medium border border-border hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              ← Prev
+            </button>
+            <span className="px-3 py-1.5 text-xs text-muted-foreground">
+              {safePage} / {totalPages}
+            </span>
+            <button
+              onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="px-3 py-1.5 rounded-md text-xs font-medium border border-border hover:bg-muted transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Next →
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

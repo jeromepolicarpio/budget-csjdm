@@ -14,6 +14,7 @@ export type Contract = {
   category: string;
   date: string;
   status: "Active" | "Completed" | "Cancelled";
+  sourceUrl?: string;
 };
 
 export type DpwhProject = {
@@ -31,6 +32,7 @@ export type DpwhProject = {
   sourceOfFunds: string;
   latitude: number | null;
   longitude: number | null;
+  sourceUrl?: string;
 };
 
 export type StatCard = {

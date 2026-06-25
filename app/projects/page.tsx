@@ -113,11 +113,16 @@ export default async function ProjectsPage() {
       <ProjectsList projects={projects} />
 
       <p className="text-xs text-muted-foreground mt-6">
-        Source: <abbr title="Department of Public Works and Highways">DPWH</abbr> Infrastructure Transparency Dataset via{" "}
-        <a href="https://data.bettergov.ph/datasets/19" target="_blank" rel="noopener noreferrer" className="underline">
+        Source: DPWH Infrastructure Transparency Dataset via{" "}
+        <a
+          href="https://data.bettergov.ph/datasets/19"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
+        >
           BetterGov.ph Dataset #19
         </a>
-        .
+        . Click any contract ID to view its source details and verification steps.
       </p>
     </div>
   );

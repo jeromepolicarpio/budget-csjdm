@@ -114,6 +114,11 @@ export async function getContracts(): Promise<Contract[]> {
   return [];
 }
 
+export async function getContractById(id: string): Promise<Contract | null> {
+  const contracts = await getContracts();
+  return contracts.find((c) => c.id === id) ?? null;
+}
+
 // ── DPWH projects ─────────────────────────────────────────────────────────
 // Primary: BetterGov DPWH Meilisearch (live, hourly cache)
 // Fallback: Neon (scraped via Playwright, refreshed by daily cron)
@@ -143,4 +148,9 @@ export async function getDpwhProjects(): Promise<DpwhProject[]> {
     latitude: r.latitude ?? null,
     longitude: r.longitude ?? null,
   }));
+}
+
+export async function getDpwhProjectById(contractId: string): Promise<import("./types").DpwhProject | null> {
+  const projects = await getDpwhProjects();
+  return projects.find((p) => p.contractId === contractId) ?? null;
 }

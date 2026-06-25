@@ -25,6 +25,7 @@ function yoyColorClass(current: number, prev: BudgetYear | undefined, field: "in
   if (field === "income") return diff > 0 ? "text-green-600" : diff < 0 ? "text-red-600" : "";
   return diff > 0 ? "text-red-600" : diff < 0 ? "text-green-600" : "";
 }
+import Link from "next/link";
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
@@ -51,7 +52,16 @@ export default async function BudgetPage() {
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-1">Budget Dashboard</h1>
       <p className="text-muted-foreground mb-4">
-        CSJDM annual fiscal data sourced from BLGF (Bureau of Local Government Finance).
+        CSJDM annual fiscal data sourced from the{" "}
+        <a
+          href="https://blgf.gov.ph/lgu-fiscal-data/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          Bureau of Local Government Finance (BLGF)
+        </a>
+        .
       </p>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         {[
@@ -127,7 +137,19 @@ export default async function BudgetPage() {
         </table>
       </div>
       <p className="text-xs text-muted-foreground mt-3">
-        Source: <abbr title="Bureau of Local Government Finance">BLGF</abbr> Annual Statement of Receipts and Expenditures.
+        Source:{" "}
+        <a
+          href="https://blgf.gov.ph/lgu-fiscal-data/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline underline-offset-2 hover:text-foreground transition-colors"
+        >
+          BLGF Annual Statement of Receipts and Expenditures
+        </a>
+        .{" "}
+        <Link href="/budget/source" className="underline underline-offset-2 hover:text-foreground transition-colors">
+          View source details →
+        </Link>
       </p>
     </div>
   );
