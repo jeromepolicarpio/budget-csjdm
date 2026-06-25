@@ -14,7 +14,6 @@ const links = [
   { href: "/procurement", label: "Procurement" },
   { href: "/projects", label: "Projects" },
   { href: "/accountability", label: "Accountability" },
-  { href: "/sources", label: "Sources" },
   { href: "/about", label: "About" },
 ];
 
