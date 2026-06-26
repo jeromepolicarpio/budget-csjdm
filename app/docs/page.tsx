@@ -192,7 +192,7 @@ const faqs: { q: string; a: React.ReactNode }[] = [
       <>
         Yes. The portal is open-source and available on{" "}
         <a
-          href="https://github.com/crispee107161/csjdm-budget"
+          href="https://github.com/jeromepolicarpio/budget-csjdm"
           target="_blank"
           rel="noopener noreferrer"
           className="underline underline-offset-2 hover:text-foreground"

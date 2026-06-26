@@ -13,7 +13,7 @@ A citizen-built transparency tracker for **City of San Jose del Monte, Bulacan**
 
 ## Why This Exists
 
-CSJDM is the 4th most populous city in the Philippines, yet its budget data is buried in spreadsheets on a government website most residents don't know exists. This site makes that data readable, searchable, and linkable — so ordinary San Joseños can ask: *"We spent how much on flood control — then why did 22 barangays still flood?"*
+CSJDM has **651,813 residents** (PSA 2020 census) — the largest city in Central Luzon, the 18th most populated in the Philippines, growing at 2.71% a year across 62 barangays. Its annual budget is ₱5.79 billion. Yet that financial data is buried in government spreadsheets most residents don't know exist. This portal makes it readable, searchable, and linkable — so ordinary San Joseños can ask: *"We spent how much on flood control — then why did 22 barangays still flood?"*
 
 ---
 
