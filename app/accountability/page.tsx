@@ -271,6 +271,12 @@ export default async function AccountabilityPage() {
         incident reports, and news reports (Manila Times, Rappler, GMA News, The Watchers, Inquirer, PNA).
         Numbers are computed from live database records; narratives are sourced and linked above.
       </p>
+      <p className="text-xs text-muted-foreground mt-2">
+        Findings last reviewed: <time dateTime="2025-11">November 2025</time>. Budget and contract
+        figures update automatically from live data. Narrative details (water crisis status, flood
+        event dates, tanker cost estimates) reflect published reports as of that date — verify
+        primary sources linked above for the latest developments.
+      </p>
     </div>
   );
 }

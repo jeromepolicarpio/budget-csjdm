@@ -9,13 +9,6 @@ import Link from "next/link";
 import { ArrowRight, AlertTriangle, TrendingUp, Building2, FileText, Check } from "lucide-react";
 import { ContactTrigger } from "@/components/contact-trigger";
 
-const BUDGET_STEPS = [
-  { label: "Executive Prepared", sub: "LGU Budget Office", done: true, active: false },
-  { label: "Council Review", sub: "Sanggunian Panlungsod", done: true, active: false },
-  { label: "Budget Enacted", sub: "Resolution passed", done: true, active: false },
-  { label: "In Effect", sub: "Active (CY 2024)", done: false, active: true },
-];
-
 export default async function HomePage() {
   const [budgetData, projects, contracts] = await Promise.all([
     getBudgetYears(),
@@ -24,6 +17,13 @@ export default async function HomePage() {
   ]);
 
   const latest = budgetData[budgetData.length - 1];
+
+  const BUDGET_STEPS = [
+    { label: "Executive Prepared", sub: "LGU Budget Office", done: true, active: false },
+    { label: "Council Review", sub: "Sanggunian Panlungsod", done: true, active: false },
+    { label: "Budget Enacted", sub: "Resolution passed", done: true, active: false },
+    { label: "In Effect", sub: `Active (CY ${latest.year})`, done: false, active: true },
+  ];
   const totalDpwhBudget = projects.reduce((sum, p) => sum + p.budget, 0);
   const ongoingProjects = projects.filter((p) => p.status === "On-going").length;
   const activeContracts = contracts.filter((c) => c.status === "Active").length;

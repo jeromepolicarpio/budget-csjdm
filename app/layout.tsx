@@ -44,7 +44,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <abbr title="Department of Public Works and Highways">DPWH</abbr> open data.
               </p>
               <p className="mt-1">&ldquo;Para sa bawat San Joseño&rdquo; — Not affiliated with the City Government of CSJDM.</p>
-              <p className="mt-2">Spotted an error? <ContactTrigger /></p>
+              <p className="mt-2">Spotted an error? <ContactTrigger /> · <a href="/disclaimer" className="underline hover:text-foreground">Disclaimer</a></p>
             </div>
           </footer>
           <Analytics />
