@@ -18,6 +18,15 @@ export default async function ProcurementPage() {
     .filter((c) => c.category === "Water & Utilities")
     .reduce((sum, c) => sum + c.amount, 0);
 
+  if (contracts.length === 0) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold tracking-tight mb-1">Procurement & Contracts</h1>
+        <p className="text-muted-foreground">No contract data available at the moment.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-1">Procurement & Contracts</h1>
@@ -31,7 +40,7 @@ export default async function ProcurementPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Total Awarded</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{formatPeso(total)}</p>
+            <p className="text-xl font-bold sm:text-2xl">{formatPeso(total)}</p>
             <p className="text-xs text-muted-foreground">{contracts.length} contracts</p>
           </CardContent>
         </Card>
@@ -40,7 +49,7 @@ export default async function ProcurementPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Active Contracts</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{active.length}</p>
+            <p className="text-xl font-bold sm:text-2xl">{active.length}</p>
             <p className="text-xs text-muted-foreground">{formatPeso(active.reduce((s, c) => s + c.amount, 0))}</p>
           </CardContent>
         </Card>
@@ -49,7 +58,7 @@ export default async function ProcurementPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Health</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{formatPeso(healthSpend)}</p>
+            <p className="text-xl font-bold sm:text-2xl">{formatPeso(healthSpend)}</p>
             <p className="text-xs text-muted-foreground">{healthCount} health contracts</p>
           </CardContent>
         </Card>
@@ -58,14 +67,14 @@ export default async function ProcurementPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Water & Utilities</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{formatPeso(waterSpend)}</p>
+            <p className="text-xl font-bold sm:text-2xl">{formatPeso(waterSpend)}</p>
             <p className="text-xs text-muted-foreground">250k residents lack water</p>
           </CardContent>
         </Card>
       </div>
 
       <ProcurementTable contracts={contracts} />
-      <p className="text-xs text-muted-foreground mt-3">
+      <p className="text-xs text-muted-foreground mt-4">
         Source:{" "}
         <a
           href="https://www.philgeps.gov.ph/"

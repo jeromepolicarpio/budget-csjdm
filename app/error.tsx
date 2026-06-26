@@ -16,7 +16,7 @@ export default function ErrorBoundary({
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-20 flex flex-col items-center text-center">
-      <div className="bg-amber-50 border border-amber-200 rounded-full p-4 mb-6">
+      <div className="bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900 rounded-full p-4 mb-6">
         <AlertTriangle size={32} className="text-amber-500" />
       </div>
       <h2 className="text-xl font-semibold mb-2">Data temporarily unavailable</h2>

@@ -151,15 +151,15 @@ export default async function HomePage() {
 
       <div className="max-w-6xl mx-auto px-4 py-10">
         {/* Alert banner */}
-        <div className="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-4 flex gap-3">
+        <div className="mt-3 bg-amber-50 border border-amber-200 dark:bg-amber-950/30 dark:border-amber-900 rounded-lg p-4 flex gap-3">
           <AlertTriangle aria-hidden="true" className="text-amber-500 shrink-0 mt-0.5" size={18} />
           <div>
-            <p className="font-medium text-amber-900 text-sm">Active Water Crisis</p>
-            <p className="text-amber-800 text-sm mt-0.5">
+            <p className="font-medium text-amber-900 dark:text-amber-200 text-sm">Active Water Crisis</p>
+            <p className="text-amber-800 dark:text-amber-300 text-sm mt-0.5">
               250,000 CSJDM residents are without reliable water supply after PrimeWater&apos;s contract
               was terminated. The city allocated {formatPeso(latest.expenditure)} in {latest.year} — see
               how much went to water infrastructure.{" "}
-              <Link href="/accountability" className="underline font-medium">
+              <Link href="/accountability" className="underline underline-offset-2 font-medium">
                 View accountability report →
               </Link>
             </p>
@@ -268,7 +268,7 @@ export default async function HomePage() {
               href="https://data.bettergov.ph"
               target="_blank"
               rel="noopener noreferrer"
-              className="underline hover:text-foreground"
+              className="underline underline-offset-2 hover:text-foreground transition-colors"
             >
               BetterGov.ph
             </a>

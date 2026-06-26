@@ -157,7 +157,7 @@ export default async function AccountabilityPage() {
             <Card key={type}>
               <CardContent className="p-4 text-center">
                 <p className={`text-3xl font-bold ${colors[type]}`}>{count}</p>
-                <p className="text-sm text-muted-foreground">{labels[type]}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground">{labels[type]}</p>
               </CardContent>
             </Card>
           );

@@ -77,7 +77,7 @@ export default async function BudgetPage() {
               </CardTitle>
             </CardHeader>
             <CardContent className="px-4 pb-4">
-              <p className="text-2xl font-bold">{s.value}</p>
+              <p className="text-xl font-bold sm:text-2xl">{s.value}</p>
               {s.note && <p className="text-xs text-muted-foreground">{s.note}</p>}
             </CardContent>
           </Card>
@@ -136,7 +136,7 @@ export default async function BudgetPage() {
           </tbody>
         </table>
       </div>
-      <p className="text-xs text-muted-foreground mt-3">
+      <p className="text-xs text-muted-foreground mt-4">
         Source:{" "}
         <a
           href="https://blgf.gov.ph/lgu-fiscal-data/"

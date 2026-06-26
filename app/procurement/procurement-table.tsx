@@ -9,18 +9,18 @@ import { X, ExternalLink } from "lucide-react";
 const ITEMS_PER_PAGE = 10;
 
 const STATUS_COLORS: Record<string, string> = {
-  Active: "bg-green-100 text-green-800",
-  Completed: "bg-blue-100 text-blue-800",
-  Cancelled: "bg-red-100 text-red-800",
+  Active: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+  Completed: "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+  Cancelled: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Flood Control": "bg-amber-100 text-amber-800",
-  "Water & Utilities": "bg-cyan-100 text-cyan-800",
-  Roads: "bg-slate-100 text-slate-800",
-  Buildings: "bg-purple-100 text-purple-800",
-  "Street Lighting": "bg-yellow-100 text-yellow-800",
-  Health: "bg-pink-100 text-pink-800",
+  "Flood Control": "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+  "Water & Utilities": "bg-cyan-100 text-cyan-800 dark:bg-cyan-900/40 dark:text-cyan-300",
+  Roads: "bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300",
+  Buildings: "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
+  "Street Lighting": "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300",
+  Health: "bg-pink-100 text-pink-800 dark:bg-pink-900/40 dark:text-pink-300",
 };
 
 type SortKey = "amount" | "date";

@@ -7,10 +7,10 @@ import { ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 const STATUS_COLORS: Record<string, string> = {
-  Completed: "bg-green-100 text-green-800",
-  "On-going": "bg-blue-100 text-blue-800",
-  Suspended: "bg-amber-100 text-amber-800",
-  Terminated: "bg-red-100 text-red-800",
+  Completed: "bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300",
+  "On-going": "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300",
+  Suspended: "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300",
+  Terminated: "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300",
 };
 
 const STATUS_BAR_COLORS: Record<string, string> = {

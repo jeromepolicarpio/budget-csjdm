@@ -16,6 +16,15 @@ export default async function ProjectsPage() {
   const floodProjects = projects.filter((p) => p.category === "Flood Control");
   const byBarangay = aggregateByBarangay(projects).slice(0, 15);
 
+  if (projects.length === 0) {
+    return (
+      <div className="max-w-6xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold tracking-tight mb-1">DPWH Infrastructure Projects</h1>
+        <p className="text-muted-foreground">No project data available at the moment.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-10">
       <h1 className="text-3xl font-bold tracking-tight mb-1">DPWH Infrastructure Projects</h1>
@@ -29,7 +38,7 @@ export default async function ProjectsPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Total Budget</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{formatPeso(total)}</p>
+            <p className="text-xl font-bold sm:text-2xl">{formatPeso(total)}</p>
             <p className="text-xs text-muted-foreground">{projects.length} projects</p>
           </CardContent>
         </Card>
@@ -38,7 +47,7 @@ export default async function ProjectsPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">On-going</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{ongoing.length}</p>
+            <p className="text-xl font-bold sm:text-2xl">{ongoing.length}</p>
             <p className="text-xs text-muted-foreground">{formatPeso(ongoing.reduce((s, p) => s + p.budget, 0))}</p>
           </CardContent>
         </Card>
@@ -47,7 +56,7 @@ export default async function ProjectsPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Completed</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{completed.length}</p>
+            <p className="text-xl font-bold sm:text-2xl">{completed.length}</p>
             <p className="text-xs text-muted-foreground">{formatPeso(completed.reduce((s, p) => s + p.budget, 0))}</p>
           </CardContent>
         </Card>
@@ -56,7 +65,7 @@ export default async function ProjectsPage() {
             <CardTitle className="text-xs text-muted-foreground font-medium uppercase tracking-wide">Flood Control</CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <p className="text-2xl font-bold">{floodProjects.length} projects</p>
+            <p className="text-xl font-bold sm:text-2xl">{floodProjects.length} projects</p>
             <p className="text-xs text-muted-foreground">{formatPeso(floodProjects.reduce((s, p) => s + p.budget, 0))}</p>
           </CardContent>
         </Card>
@@ -112,7 +121,7 @@ export default async function ProjectsPage() {
 
       <ProjectsList projects={projects} />
 
-      <p className="text-xs text-muted-foreground mt-6">
+      <p className="text-xs text-muted-foreground mt-4">
         Source: DPWH Infrastructure Transparency Dataset via{" "}
         <a
           href="https://data.bettergov.ph/datasets/19"
