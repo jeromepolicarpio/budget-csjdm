@@ -14,7 +14,7 @@ const links = [
   { href: "/procurement", label: "Procurement" },
   { href: "/projects", label: "Projects" },
   { href: "/accountability", label: "Accountability" },
-  { href: "/about", label: "About" },
+  { href: "/docs", label: "Docs" },
 ];
 
 export function Navbar() {
