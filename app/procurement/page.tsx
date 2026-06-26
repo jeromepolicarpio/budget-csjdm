@@ -1,6 +1,16 @@
 export const revalidate = 3600;
 
+import type { Metadata } from "next";
 import { getContracts } from "@/lib/queries";
+
+export const metadata: Metadata = {
+  title: "Procurement & Contracts | CSJDM Budget Portal",
+  description: "Explore San Jose del Monte's government contracts — active projects, contractors, amounts, and categories from PhilGEPS.",
+  openGraph: {
+    title: "Procurement & Contracts | CSJDM Budget Portal",
+    description: "Explore San Jose del Monte's government contracts — active projects, contractors, amounts, and categories from PhilGEPS.",
+  },
+};
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ProcurementTable } from "./procurement-table";

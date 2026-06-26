@@ -1,6 +1,16 @@
 export const revalidate = 3600;
 
+import type { Metadata } from "next";
 import { getBudgetYears, getDpwhProjects, getContracts } from "@/lib/queries";
+
+export const metadata: Metadata = {
+  title: "Accountability Report | CSJDM Budget Portal",
+  description: "Critical findings on CSJDM's spending priorities — water crisis funding gaps, budget allocations, and infrastructure accountability.",
+  openGraph: {
+    title: "Accountability Report | CSJDM Budget Portal",
+    description: "Critical findings on CSJDM's spending priorities — water crisis funding gaps, budget allocations, and infrastructure accountability.",
+  },
+};
 import { formatPeso } from "@/lib/data";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";

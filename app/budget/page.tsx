@@ -1,6 +1,16 @@
 export const revalidate = 86400;
 
+import type { Metadata } from "next";
 import { getBudgetYears } from "@/lib/queries";
+
+export const metadata: Metadata = {
+  title: "Budget Dashboard | CSJDM Budget Portal",
+  description: "Year-by-year breakdown of San Jose del Monte's income, expenditure, and surplus from 2018 to present.",
+  openGraph: {
+    title: "Budget Dashboard | CSJDM Budget Portal",
+    description: "Year-by-year breakdown of San Jose del Monte's income, expenditure, and surplus from 2018 to present.",
+  },
+};
 import type { BudgetYear } from "@/lib/types";
 
 function surplusColorClass(surplus: number, income: number): string {

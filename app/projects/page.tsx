@@ -1,6 +1,16 @@
 export const revalidate = 3600;
 
+import type { Metadata } from "next";
 import { getDpwhProjects } from "@/lib/queries";
+
+export const metadata: Metadata = {
+  title: "DPWH Infrastructure Projects | CSJDM Budget Portal",
+  description: "Track DPWH infrastructure projects in San Jose del Monte — roads, flood control, buildings, and more by status and barangay.",
+  openGraph: {
+    title: "DPWH Infrastructure Projects | CSJDM Budget Portal",
+    description: "Track DPWH infrastructure projects in San Jose del Monte — roads, flood control, buildings, and more by status and barangay.",
+  },
+};
 import { formatPeso } from "@/lib/data";
 import { aggregateByBarangay } from "@/lib/barangay";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";

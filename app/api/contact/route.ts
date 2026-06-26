@@ -28,8 +28,9 @@ export async function POST(req: NextRequest) {
   // Strip BOM and whitespace — Windows clipboard can prepend U+FEFF invisibly
   const apiKey = process.env.RESEND_API_KEY?.replace(/^﻿/, "").trim();
 
-  if (!apiKey) {
-    console.error("[contact] RESEND_API_KEY is not set");
+  const contactTo = process.env.CONTACT_EMAIL_TO;
+  if (!apiKey || !contactTo) {
+    console.error("[contact] RESEND_API_KEY or CONTACT_EMAIL_TO is not set");
     return NextResponse.json({ error: "Email service not configured" }, { status: 503 });
   }
 
@@ -42,7 +43,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         from: "CSJDM Budget Portal <onboarding@resend.dev>",
-        to: ["policarpiojerome2005@gmail.com"],
+        to: [contactTo],
         reply_to: email,
         subject: `[CSJDM Budget] ${reason} - from ${email}`,
         text: `Reason: ${reason}\nFrom: ${email}\n\n${message.trim()}`,
