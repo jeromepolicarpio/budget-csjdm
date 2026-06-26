@@ -50,7 +50,7 @@ export default async function HomePage() {
           <h1 className="text-5xl sm:text-6xl font-bold tracking-tight mb-3 leading-tight text-balance">
             People&apos;s <span className="text-primary">Budget Portal</span>
           </h1>
-          <p className="text-base font-semibold text-primary/90 mb-8">Saan napunta ang pera ng bayan?</p>
+          <p className="text-base font-semibold text-primary/90 mb-8">Saan napupunta ang pera ng bayan?</p>
 
           <dl className="w-full flex flex-col sm:flex-row items-center justify-center divide-y sm:divide-y-0 sm:divide-x border rounded-xl overflow-hidden bg-background">
             <div className="flex-1 px-6 py-5 text-center">
