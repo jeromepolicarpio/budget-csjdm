@@ -43,7 +43,7 @@ export default function DisclaimerPage() {
             also via BetterGov.ph.
           </p>
           <p className="text-muted-foreground mt-3">
-            While we make every effort to present data accurately, figures are reproduced from public
+            While I make every effort to present data accurately, figures are reproduced from public
             sources and may contain errors present in those original records. Computed values
             (totals, per-capita figures, year-on-year changes) are derived automatically and may not
             match official government summaries. <strong className="text-foreground">Do not use
@@ -89,8 +89,7 @@ export default function DisclaimerPage() {
           <h2 className="text-base font-semibold mb-2">No Warranty</h2>
           <p className="text-muted-foreground">
             This site is provided as-is, without any warranty of completeness, accuracy, or
-            fitness for a particular purpose. The maintainers are not liable for decisions made
-            based on data presented here.
+            fitness for a particular purpose. I am not liable for decisions made based on data presented here.
           </p>
         </section>
       </div>
