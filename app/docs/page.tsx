@@ -136,7 +136,16 @@ const envVars: { name: string; required: boolean; description: string }[] = [
 const faqs: { q: string; a: React.ReactNode }[] = [
   {
     q: "Is this portal affiliated with the City Government of San Jose del Monte?",
-    a: "No. This is an independent civic project. It is not affiliated with, endorsed by, or connected to the City Government of CSJDM, any of its offices, or any elected official.",
+    a: (
+      <>
+        <strong className="text-foreground">No.</strong> This is an independent civic project. It
+        is{" "}
+        <strong className="text-foreground">
+          not affiliated with, endorsed by, or connected to the City Government of CSJDM
+        </strong>
+        , any of its offices, or any elected official.
+      </>
+    ),
   },
   {
     q: "How often is the data updated?",
