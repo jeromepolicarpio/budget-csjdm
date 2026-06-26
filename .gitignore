@@ -56,3 +56,4 @@ DESIGN_TODO.md
 
 # local working notes (keep files, don't commit)
 *.md
+!README.md
