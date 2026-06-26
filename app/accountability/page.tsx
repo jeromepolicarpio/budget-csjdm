@@ -195,7 +195,7 @@ export default async function AccountabilityPage() {
 
             {(f.relatedContracts || f.relatedProjects) && (
               <details className="mt-3 ml-8">
-                <summary className={`text-xs font-medium cursor-pointer select-none hover:underline ${detailColors[f.type]}`}>
+                <summary className={`text-xs font-medium cursor-pointer select-none underline underline-offset-2 ${detailColors[f.type]}`}>
                   Show related {f.relatedContracts ? `contracts (${f.relatedContracts.length})` : ""}
                   {f.relatedContracts && f.relatedProjects ? " & " : ""}
                   {f.relatedProjects ? `projects (${f.relatedProjects.length})` : ""}
@@ -207,7 +207,10 @@ export default async function AccountabilityPage() {
                       href={`/procurement/${encodeURIComponent(c.id)}/source`}
                       className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3 hover:opacity-70 transition-opacity"
                     >
-                      <span className={`truncate ${detailColors[f.type]}`}>{c.title}</span>
+                      <span className={`min-w-0 truncate underline underline-offset-2 inline-flex items-center gap-0.5 ${detailColors[f.type]}`}>
+                        {c.title}
+                        <ExternalLink size={9} className="shrink-0" />
+                      </span>
                       <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(c.amount)}</span>
                     </Link>
                   ))}
@@ -217,7 +220,10 @@ export default async function AccountabilityPage() {
                       href={`/projects/${encodeURIComponent(p.contractId)}/source`}
                       className="flex justify-between text-xs py-1 border-b border-black/10 dark:border-white/10 last:border-0 gap-3 hover:opacity-70 transition-opacity"
                     >
-                      <span className={`truncate ${detailColors[f.type]}`}>{p.description}</span>
+                      <span className={`min-w-0 truncate underline underline-offset-2 inline-flex items-center gap-0.5 ${detailColors[f.type]}`}>
+                        {p.description}
+                        <ExternalLink size={9} className="shrink-0" />
+                      </span>
                       <span className={`shrink-0 font-semibold ${detailColors[f.type]}`}>{formatPeso(p.budget)}</span>
                     </Link>
                   ))}

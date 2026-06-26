@@ -209,7 +209,7 @@ export function ProcurementTable({ contracts }: Props) {
               <p className="font-medium leading-snug text-sm">{c.title}</p>
               <Link
                 href={`/procurement/${encodeURIComponent(c.id)}/source`}
-                className="text-xs text-primary font-mono hover:underline underline-offset-2 inline-flex items-center gap-0.5"
+                className="text-xs text-primary font-mono underline underline-offset-2 inline-flex items-center gap-0.5"
               >
                 Ref: {c.id} <ExternalLink size={10} />
               </Link>
@@ -293,7 +293,7 @@ export function ProcurementTable({ contracts }: Props) {
                   <td className="px-4 py-3">
                     <Link
                       href={`/procurement/${encodeURIComponent(c.id)}/source`}
-                      className="font-mono text-xs text-primary hover:underline underline-offset-2 inline-flex items-center gap-0.5"
+                      className="font-mono text-xs text-primary underline underline-offset-2 inline-flex items-center gap-0.5"
                       title="View source details for this contract"
                     >
                       {c.id}
