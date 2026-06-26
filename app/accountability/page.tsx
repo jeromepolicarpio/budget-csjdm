@@ -40,6 +40,15 @@ export default async function AccountabilityPage() {
     getContracts(),
   ]);
 
+  if (budgetData.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-10">
+        <h1 className="text-3xl font-bold tracking-tight mb-2">Accountability Report</h1>
+        <p className="text-muted-foreground">No budget data available at the moment.</p>
+      </div>
+    );
+  }
+
   const latest = budgetData[budgetData.length - 1];
   const floodBudget = projects
     .filter((p) => p.category === "Flood Control")
