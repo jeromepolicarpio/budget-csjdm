@@ -50,6 +50,7 @@ export default async function AccountabilityPage() {
   }
 
   const latest = budgetData[budgetData.length - 1];
+  const firstYear = budgetData[0].year;
   const floodBudget = projects
     .filter((p) => p.category === "Flood Control")
     .reduce((sum, p) => sum + p.budget, 0);
@@ -57,6 +58,7 @@ export default async function AccountabilityPage() {
     .filter((c) => c.category === "Water & Utilities")
     .reduce((sum, c) => sum + c.amount, 0);
   const drrfTotal = budgetData.reduce((sum, y) => sum + y.drrf, 0);
+  const sefTotal = budgetData.reduce((sum, y) => sum + y.sef, 0);
 
   const waterContractsList = contracts.filter((c) => c.category === "Water & Utilities");
   const floodProjectsList = projects.filter((p) => p.category === "Flood Control");
@@ -102,7 +104,7 @@ export default async function AccountabilityPage() {
     {
       type: "warn",
       title: `${formatPeso(drrfTotal)} in LDRRMF Collected — No Public Accounting`,
-      detail: `CSJDM has collected an estimated ${formatPeso(drrfTotal)} in Local Disaster Risk Reduction and Management Funds (LDRRMF) from 2020–${latest.year}. RA 10121 mandates this be spent on disaster preparedness and mitigation. The city's Full Disclosure Policy page lists the required LDRRMF utilization report, but no COA-audited summary of how these funds were actually spent has been published publicly.`,
+      detail: `CSJDM has collected an estimated ${formatPeso(drrfTotal)} in Local Disaster Risk Reduction and Management Funds (LDRRMF) from ${firstYear}–${latest.year}. RA 10121 mandates this be spent on disaster preparedness and mitigation. The city's Full Disclosure Policy page lists the required LDRRMF utilization report, but no COA-audited summary of how these funds were actually spent has been published publicly.`,
       sources: [
         { label: "CSJDM — LDRRMF Utilization (Full Disclosure)", url: "https://csjdm.gov.ph/full-disclosure-policy/report-of-local-disaster-risk-reduction-and-management-fund-ldrrmf-utilization/" },
         { label: "COA — LDRRMF Audit Reports", url: "https://www.coa.gov.ph/index.php/reports/citizen-participatory-audit-reports/category/6570-local-disaster-risk-reduction-and-management-fund-ldrrmf" },
@@ -110,8 +112,20 @@ export default async function AccountabilityPage() {
     },
     {
       type: "warn",
+      title: `${formatPeso(sefTotal)} in Special Education Fund — No Public Spending Breakdown`,
+      detail: `CSJDM's budget data (via BLGF) shows an estimated ${formatPeso(sefTotal)} collected under the Special Education Fund (SEF) from ${firstYear}–${latest.year}. These figures reflect what the city reported as SEF income — not a direct accounting of how the fund was spent. By law, SEF must be used exclusively for public school operations and facilities in the city. However, no SEF utilization report has been published online by either the city government or SDO City of San Jose del Monte. Citizens currently have no way to verify whether the fund was spent on classrooms, teachers, or learning materials — or how much remains unspent.`,
+      sources: [
+        { label: "BLGF — FY2025 SEF Income & Expenditures (xlsx)", url: "https://blgf.gov.ph/wp-content/uploads/2026/06/FY2025-SEF-Income-and-Expenditures.xlsx" },
+        { label: "BLGF — FY2024 SEF Income & Expenditures (xlsx)", url: "https://blgf.gov.ph/wp-content/uploads/2025/06/FY2024-SEF-Income-and-Expenditures.xlsx" },
+        { label: "BLGF — LGU Fiscal Data (all years)", url: "https://blgf.gov.ph/lgu-fiscal-data/" },
+        { label: "RA 5447 — Special Education Fund Act", url: "https://www.officialgazette.gov.ph/1968/09/01/republic-act-no-5447/" },
+        { label: "File an FOI — DepEd via eFOI Portal", url: "https://www.foi.gov.ph/agencies/deped" },
+      ],
+    },
+    {
+      type: "warn",
       title: "Budget Surplus Every Year — But Basic Services Are Failing",
-      detail: `CSJDM has posted a budget surplus every year from 2020–${latest.year} (${formatPeso(latest.income - latest.expenditure)} unspent in ${latest.year} alone). If the city consistently underspends its budget, why are water supply and flood control — both funded for years — still failing residents? Underspending on capital projects while outsourcing services that fail is a pattern worth scrutinizing.`,
+      detail: `CSJDM has posted a budget surplus every year from ${firstYear}–${latest.year} (${formatPeso(latest.income - latest.expenditure)} unspent in ${latest.year} alone). If the city consistently underspends its budget, why are water supply and flood control — both funded for years — still failing residents? Underspending on capital projects while outsourcing services that fail is a pattern worth scrutinizing.`,
       sources: [
         { label: "BLGF — LGU Fiscal Data", url: "https://blgf.gov.ph/lgu-fiscal-data/" },
       ],
@@ -263,7 +277,8 @@ export default async function AccountabilityPage() {
             ["City's annual water tanker cost (stopgap)", "≈₱370,000,000"],
             ["Barangays flooded — June 6, 2025", "22"],
             [`DPWH flood control budget (since ${floodSinceYear})`, formatPeso(floodBudget)],
-            [`LDRRMF collected (2020–${latest.year})`, formatPeso(drrfTotal)],
+            [`LDRRMF collected (${firstYear}–${latest.year})`, formatPeso(drrfTotal)],
+            [`SEF collected (${firstYear}–${latest.year}, est.)`, formatPeso(sefTotal)],
             [`${latest.year} budget surplus (unspent)`, formatPeso(latest.income - latest.expenditure)],
             ["Water & utility contracts awarded", formatPeso(waterContracts)],
           ].map(([label, value]) => (
@@ -281,7 +296,7 @@ export default async function AccountabilityPage() {
         Numbers are computed from live database records; narratives are sourced and linked above.
       </p>
       <p className="text-xs text-muted-foreground mt-2">
-        Findings last reviewed: <time dateTime="2025-11">November 2025</time>. Budget and contract
+        Findings last reviewed: <time dateTime="2026-06">June 2026</time>. Budget and contract
         figures update automatically from live data. Narrative details (water crisis status, flood
         event dates, tanker cost estimates) reflect published reports as of that date — verify
         primary sources linked above for the latest developments.
