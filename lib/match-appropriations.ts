@@ -101,6 +101,8 @@ function normalizeTitle(title: string): string {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
+    // "Children's" and DPWH's "CHILDRENS" must read alike.
+    .replace(/['’`]/g, "")
     .replace(/multi\s*-?\s*purpose/g, "multipurpose")
     .replace(/\bmpb\b/g, "multipurpose building")
     .replace(/by\s*-\s*pass/g, "bypass")

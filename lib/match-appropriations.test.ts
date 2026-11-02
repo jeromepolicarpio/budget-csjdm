@@ -203,6 +203,16 @@ test("rejects a bundle whose matched lines do not add up to the contract", () =>
   assert.equal(m.bundled, false);
 });
 
+test("reads Children's and CHILDRENS alike", () => {
+  // Real 2020 pair: the apostrophe split "children's" into "children" + "s".
+  assert.ok(titleTokens("St. Bernadette Children's Hospital").has("childrens"));
+  const [m] = matchAppropriations(
+    [line("Construction of St. Bernadette Children's Hospital City of San Jose Del Monte, Bulacan", 2020, 5_000_000)],
+    [project({ contractId: "20CD0126", infraYear: "2020", sourceOfFunds: "Regular Infra - GAA 2020 LP", budget: 4_700_000, description: "CONSTRUCTION OF ST. BERNADETTE CHILDRENS HOSPITAL CITY OF SAN JOSE DEL MONTE, BULACAN" })]
+  );
+  assert.equal(m.project?.contractId, "20CD0126");
+});
+
 test("never matches a project funded in another year", () => {
   const [m] = matchAppropriations(
     [line("Construction of Dike along Santo Cristo River, Barangay Kaypian, San Jose del Monte City, Bulacan", 2024)],
