@@ -2,6 +2,17 @@ export const revalidate = 3600;
 
 import type { Metadata } from "next";
 import { getBudgetYears, getDpwhProjects, getContracts } from "@/lib/queries";
+import {
+  getMoneyTrail,
+  floodLines,
+  bypassLines,
+  isOngoing,
+  type MoneyTrail,
+  type TrailSlice,
+} from "@/lib/appropriations";
+import { NATIONAL_BUDGET_PORTAL } from "@/lib/links";
+import { MoneyTrailSection } from "@/components/money-trail";
+import { phaseOf } from "@/lib/match-appropriations";
 
 export const metadata: Metadata = {
   title: "Accountability Report | CSJDM Budget Portal",
@@ -19,6 +30,53 @@ import type { Contract, DpwhProject } from "@/lib/types";
 
 type FindingType = "critical" | "warn" | "ok";
 
+const NATIONAL_BUDGET_SOURCE = {
+  label: "National Budget portal — enacted budgets 2020–2026",
+  url: `${NATIONAL_BUDGET_PORTAL}/gaa`,
+};
+
+const STALLED_PROGRESS = 50;
+const STALLED_AFTER_YEARS = 2;
+
+const EMPTY_TRAIL: MoneyTrail = { matches: [], years: [] };
+
+/**
+ * At runtime a BetterGov outage throws, so ISR keeps the last good page. During
+ * `next build` there is no last good page, so render without the trail rather
+ * than fail the whole deploy.
+ */
+async function loadMoneyTrail(): Promise<MoneyTrail | null> {
+  try {
+    return await getMoneyTrail();
+  } catch (error) {
+    if (process.env.NEXT_PHASE !== "phase-production-build") throw error;
+    console.error("Money trail unavailable at build time; rendering without it.", error);
+    return null;
+  }
+}
+
+/** Bypass lines funded two or more years ago whose DPWH project is still on-going. */
+function oldOngoingPhases(bypass: TrailSlice, thisYear: number) {
+  return bypass.matches.filter(
+    (m) => m.project && isOngoing(m.project) && thisYear - m.line.year >= STALLED_AFTER_YEARS
+  );
+}
+
+/**
+ * "Phase 8 (funded 2024, ₱300.0M): 21%" for those under half done, least advanced
+ * first. A progress of 0 is left out: the dataset uses 0 when progress is unreported.
+ */
+function stalledPhases(old: TrailSlice["matches"]): string[] {
+  return old
+    .filter((m) => m.project!.progress > 0 && m.project!.progress < STALLED_PROGRESS)
+    .sort((a, b) => a.project!.progress - b.project!.progress)
+    .map((m) => {
+      const phase = phaseOf(m.line.name);
+      const label = phase ? `Phase ${phase.toUpperCase()}` : "Road section";
+      return `${label} (funded ${m.line.year}, ${formatPeso(m.line.amount)}): ${m.project!.progress}%`;
+    });
+}
+
 type Source = {
   label: string;
   url: string;
@@ -34,11 +92,13 @@ type Finding = {
 };
 
 export default async function AccountabilityPage() {
-  const [budgetData, projects, contracts] = await Promise.all([
+  const [budgetData, projects, contracts, loadedTrail] = await Promise.all([
     getBudgetYears(),
     getDpwhProjects(),
     getContracts(),
+    loadMoneyTrail(),
   ]);
+  const trail = loadedTrail ?? EMPTY_TRAIL;
 
   if (budgetData.length === 0) {
     return (
@@ -77,6 +137,22 @@ export default async function AccountabilityPage() {
       ? ` The evacuation center in Brgy. San Rafael I (Contract 23CD0301) was only ${evacProgress}% complete when floods hit.`
       : "";
 
+  const flood = floodLines(trail);
+  const floodTrailDetail =
+    flood.matches.length > 0
+      ? ` In the national budget, Congress appropriated ${formatPeso(flood.enacted)} for ${flood.matches.length} flood-control and drainage lines naming SJDM from ${flood.firstYear}–${flood.lastYear}. DPWH project records account for ${flood.matched} of them, with contracts worth ${formatPeso(flood.contracted)}, and DPWH reports ${flood.completed} as completed. (A line that names SJDM can include works that extend beyond the city.)`
+      : "";
+
+  const bypass = bypassLines(trail);
+  const bypassOld = oldOngoingPhases(bypass, new Date().getFullYear());
+  const bypassStalled = stalledPhases(bypassOld);
+  const bypassRelated = bypass.matches.flatMap((m) => (m.project ? [m.project] : []));
+  const publishedYears = trail.years.filter((y) => y.published);
+  const appropriatedPublished = publishedYears.reduce((s, y) => s + y.enacted, 0);
+  const trailSpan = publishedYears.length
+    ? `${publishedYears[0].year}–${publishedYears[publishedYears.length - 1].year}`
+    : "";
+
   const findings: Finding[] = [
     {
       type: "critical",
@@ -93,14 +169,29 @@ export default async function AccountabilityPage() {
     {
       type: "critical",
       title: `Flooding Persists Despite ${formatPeso(floodBudget)} in Flood Projects`,
-      detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since ${floodSinceYear}. On June 6, 2025, a single habagat event inundated 22 barangays — floodwaters rose neck-deep in Barangay San Rafael I within 45 minutes, overflowing a creek and damaging a bridge railing.${evacDetail}`,
+      detail: `DPWH has funded ${formatPeso(floodBudget)} in flood control projects in CSJDM since ${floodSinceYear}.${floodTrailDetail} On June 6, 2025, a single habagat event inundated 22 barangays — floodwaters rose neck-deep in Barangay San Rafael I within 45 minutes, overflowing a creek and damaging a bridge railing.${evacDetail}`,
       sources: [
         { label: "The Watchers — June 6 flooding", url: "https://watchers.news/2025/06/10/severe-flooding-san-jose-del-monte-metro-manila-philippines/" },
         { label: "GMA News", url: "https://www.gmanetwork.com/regionaltv/news/108529/heavy-floods-hit-san-jose-del-monte-bulacan/story/" },
         { label: "Manila Standard — NDRRMC", url: "https://manilastandard.net/lgu/314600289/flood-hits-13-areas-in-san-jose-del-monte-amid-heavy-rains-ndrrmc.html" },
+        ...(flood.matches.length > 0 ? [NATIONAL_BUDGET_SOURCE] : []),
       ],
       relatedProjects: floodProjectsList,
     },
+    ...(bypass.matches.length > 0
+      ? [
+          {
+            type: "warn" as const,
+            title: `DRT–SJDM Bypass Road: ${formatPeso(bypass.enacted)} Appropriated; DPWH Reports ${bypass.completed} of ${bypass.matched} Contracts Complete`,
+            detail: `Since ${bypass.firstYear}, Congress has appropriated ${formatPeso(bypass.enacted)} across ${bypass.matches.length} budget lines for the bypass road from Doña Remedios Trinidad to San Jose del Monte, most of them numbered phases. DPWH has project records for ${bypass.matched} of those lines, with contracts worth ${formatPeso(bypass.contracted)}; it reports ${bypass.completed} complete and ${bypass.ongoing} still on-going.${bypassStalled.length > 0 ? ` Of the ${bypassOld.length} funded two or more years ago and still on-going, ${bypassStalled.length} are under half done by DPWH's own count: ${bypassStalled.join("; ")}.` : ""} The road runs between the two towns, so not all of this money is spent inside SJDM.`,
+            sources: [
+              NATIONAL_BUDGET_SOURCE,
+              { label: "DPWH project records (BetterGov)", url: "https://transparency.bettergov.ph/dpwh" },
+            ],
+            relatedProjects: bypassRelated,
+          },
+        ]
+      : []),
     {
       type: "warn",
       title: `${formatPeso(drrfTotal)} in LDRRMF Collected — No Public Accounting`,
@@ -267,6 +358,8 @@ export default async function AccountabilityPage() {
         ))}
       </div>
 
+      {loadedTrail && <MoneyTrailSection trail={loadedTrail} />}
+
       <Card>
         <CardHeader>
           <CardTitle>Key Numbers at a Glance</CardTitle>
@@ -277,6 +370,9 @@ export default async function AccountabilityPage() {
             ["City's annual water tanker cost (stopgap)", "≈₱370,000,000"],
             ["Barangays flooded — June 6, 2025", "22"],
             [`DPWH flood control budget (since ${floodSinceYear})`, formatPeso(floodBudget)],
+            ...(trailSpan
+              ? [[`National budget for DPWH work naming SJDM (${trailSpan})`, formatPeso(appropriatedPublished)]]
+              : []),
             [`LDRRMF collected (${firstYear}–${latest.year})`, formatPeso(drrfTotal)],
             [`SEF collected (${firstYear}–${latest.year}, est.)`, formatPeso(sefTotal)],
             [`${latest.year} budget surplus (unspent)`, formatPeso(latest.income - latest.expenditure)],
@@ -291,7 +387,8 @@ export default async function AccountabilityPage() {
       </Card>
 
       <p className="text-xs text-muted-foreground mt-6">
-        Data sources: BLGF LGU Fiscal Data, DPWH Infrastructure Dataset, PhilGEPS, NDRRMC/DROMIC
+        Data sources: BLGF LGU Fiscal Data, DPWH Infrastructure Dataset, PhilGEPS, enacted national
+        budgets (GAA) via the BetterGov Budget API, NDRRMC/DROMIC
         incident reports, and news reports (Manila Times, Rappler, GMA News, The Watchers, Inquirer, PNA).
         Numbers are computed from live database records; narratives are sourced and linked above.
       </p>

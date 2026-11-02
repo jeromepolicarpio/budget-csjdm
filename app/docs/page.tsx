@@ -14,6 +14,7 @@ const navItems = [
   { href: "#pages", label: "Pages" },
   { href: "#data-sources", label: "Data Sources" },
   { href: "#data-flow", label: "How Data Flows" },
+  { href: "#money-trail", label: "Money Trail Method" },
   { href: "#tech-stack", label: "Tech Stack" },
   { href: "#environment-variables", label: "Environment Variables" },
   { href: "#faq", label: "FAQ" },
@@ -367,6 +368,46 @@ export default function DocsPage() {
                   environment variable.
                 </p>
               </div>
+            </div>
+          </section>
+
+          {/* Money Trail */}
+          <section id="money-trail" className="scroll-mt-20">
+            <h2 className="text-xl font-semibold mb-1">Money Trail Method</h2>
+            <p className="text-sm text-muted-foreground mb-5">
+              How the Accountability page connects the national budget to DPWH projects.
+            </p>
+            <div className="border rounded-lg p-5 space-y-3 text-sm text-muted-foreground leading-relaxed">
+              <p>
+                <span className="font-medium text-foreground">Budget side.</span> Every DPWH program,
+                activity or project in the enacted General Appropriations Act (2020 onward) whose name
+                contains &ldquo;San Jose del Monte&rdquo;, from the{" "}
+                <a href="https://budget.bettergov.ph/docs" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">BetterGov Budget API</a>.
+                Region-wide studies that only mention the city are left out. The same lines are listed
+                on the{" "}
+                <a href="https://national-budget-csjdm.vercel.app/gaa" target="_blank" rel="noopener noreferrer" className="underline underline-offset-2">National Budget portal</a>.
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Project side.</span> DPWH e-IPIS projects
+                (via BetterGov) whose titles name the city, including DPWH&apos;s short spellings
+                (&ldquo;SJDM&rdquo;, &ldquo;SJDMB&rdquo;, &ldquo;SN JOSE DEL MONTE&rdquo;).
+              </p>
+              <p>
+                <span className="font-medium text-foreground">Matching.</span> The two sources share no
+                ID. A budget line matches a project funded from the same year&apos;s GAA when at least
+                75% of the line&apos;s title words appear in the project&apos;s title, after expanding
+                DPWH abbreviations (&ldquo;CONST.&rdquo;, &ldquo;RD.&rdquo;) and ignoring place words.
+                Titles that name different phases never match, and the contract must be 50–105% of the
+                appropriation (contracts are awarded at or below it; outside that range a title match
+                was always the wrong project). Each project is used once, best match first. Matches at 90% or more are shown as matched; 75–90% as probable.
+              </p>
+              <p>
+                <span className="font-medium text-foreground">What it does not show.</span> An
+                appropriation is the authority to spend, not spending. DPWH publishes no payment
+                amounts for these projects, so the trail stops at the contract amount and DPWH&apos;s own
+                reported status. A line with no matching record is a lead to check, not proof that
+                money went missing.
+              </p>
             </div>
           </section>
 

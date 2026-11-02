@@ -7,6 +7,8 @@ import {
   fetchLivePhilGeps,
 } from "./bettergov";
 import { categorizeTitle } from "./categorize";
+import { unstable_cache } from "next/cache";
+import { fetchAppropriationProjects } from "./appropriations";
 import type { BudgetYear, Contract, DpwhProject } from "./types";
 
 // ── Budget years ───────────────────────────────────────────────────────────
@@ -150,7 +152,20 @@ export async function getDpwhProjects(): Promise<DpwhProject[]> {
   }));
 }
 
-export async function getDpwhProjectById(contractId: string): Promise<import("./types").DpwhProject | null> {
+export async function getDpwhProjectById(contractId: string): Promise<DpwhProject | null> {
   const projects = await getDpwhProjects();
-  return projects.find((p) => p.contractId === contractId) ?? null;
+  const found = projects.find((p) => p.contractId === contractId);
+  if (found) return found;
+  // The accountability money trail links to projects DPWH titles with short
+  // spellings of the city ("SJDMB", "SN JOSE DEL MONTE"), which the list above
+  // does not include. Look there before giving up. Cached, so lookups that miss
+  // (including made-up ids) do not each fire fresh searches.
+  const wider = await getAppropriationProjectsCached().catch(() => []);
+  return wider.find((p) => p.contractId === contractId) ?? null;
 }
+
+const getAppropriationProjectsCached = unstable_cache(
+  fetchAppropriationProjects,
+  ["appropriation-projects"],
+  { revalidate: 3600 }
+);

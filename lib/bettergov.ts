@@ -26,10 +26,15 @@ function isFundSourceLabel(category: string): boolean {
   return /\d/.test(category); // any digit → it's a year/code, not a category
 }
 
+/** A hung request would stall ISR regeneration and the build. */
+const REQUEST_TIMEOUT_MS = 15_000;
+
+type MeilisearchResult = { hits: Record<string, unknown>[]; estimatedTotalHits?: number };
+
 async function meilisearchPost(
   index: string,
   body: Record<string, unknown>
-): Promise<{ hits: Record<string, unknown>[] }> {
+): Promise<MeilisearchResult> {
   const key = process.env.BETTERGOV_MEILISEARCH_KEY;
   if (!key) throw new Error("BETTERGOV_MEILISEARCH_KEY environment variable is not set");
   const res = await fetch(`${MEILISEARCH_URL}/${index}/search`, {
@@ -40,9 +45,10 @@ async function meilisearchPost(
     },
     body: JSON.stringify(body),
     next: { revalidate: 3600 },
+    signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
   });
   if (!res.ok) throw new Error(`BetterGov ${index} ${res.status}`);
-  return res.json() as Promise<{ hits: Record<string, unknown>[] }>;
+  return res.json() as Promise<MeilisearchResult>;
 }
 
 // ── DPWH (BetterGov Meilisearch) ──────────────────────────────────────────
@@ -135,6 +141,25 @@ export async function fetchLiveDpwhProjects(): Promise<DpwhProject[]> {
         .includes("san jose del monte")
     )
     .map(normalizeDpwhHit);
+}
+
+/**
+ * One DPWH search where every word must match, so the result is the whole set
+ * rather than the first `limit` of a loose search ("San Jose del Monte" alone
+ * loosely matches ~10,000 records). Throws instead of returning a cut list.
+ * Callers still decide which hits belong to SJDM.
+ */
+export async function searchDpwhProjects(q: string, limit = 1000): Promise<DpwhProject[]> {
+  const { hits = [], estimatedTotalHits } = await meilisearchPost("dpwh", {
+    q,
+    limit,
+    matchingStrategy: "all",
+    attributesToRetrieve: ["*"],
+  });
+  if ((estimatedTotalHits ?? hits.length) > hits.length) {
+    throw new Error(`BetterGov dpwh: "${q}" has ${estimatedTotalHits} hits, more than the ${limit} fetched`);
+  }
+  return hits.map(normalizeDpwhHit);
 }
 
 // ── BLGF ──────────────────────────────────────────────────────────────────

@@ -13,7 +13,8 @@
     "db:seed": "tsx --env-file=.env.local scripts/seed.ts",
     "scrape:philgeps": "tsx --env-file=.env.local scripts/scrape-philgeps.ts",
     "scrape:dpwh": "tsx --env-file=.env.local scripts/scrape-dpwh.ts",
-    "import:blgf": "tsx --env-file=.env.local scripts/import-blgf.ts"
+    "import:blgf": "tsx --env-file=.env.local scripts/import-blgf.ts",
+    "test": "tsx --test \"lib/**/*.test.ts\""
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
