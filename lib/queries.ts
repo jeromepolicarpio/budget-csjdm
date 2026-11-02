@@ -7,8 +7,6 @@ import {
   fetchLivePhilGeps,
 } from "./bettergov";
 import { categorizeTitle } from "./categorize";
-import { unstable_cache } from "next/cache";
-import { fetchAppropriationProjects } from "./appropriations";
 import type { BudgetYear, Contract, DpwhProject } from "./types";
 
 // ── Budget years ───────────────────────────────────────────────────────────
@@ -122,7 +120,8 @@ export async function getContractById(id: string): Promise<Contract | null> {
 }
 
 // ── DPWH projects ─────────────────────────────────────────────────────────
-// Primary: BetterGov DPWH Meilisearch (live, hourly cache)
+// Primary: BetterGov DPWH Meilisearch (live, hourly cache), every spelling of
+// the city, complete or an error (see fetchLiveDpwhProjects)
 // Fallback: Neon (scraped via Playwright, refreshed by daily cron)
 
 export async function getDpwhProjects(): Promise<DpwhProject[]> {
@@ -154,18 +153,5 @@ export async function getDpwhProjects(): Promise<DpwhProject[]> {
 
 export async function getDpwhProjectById(contractId: string): Promise<DpwhProject | null> {
   const projects = await getDpwhProjects();
-  const found = projects.find((p) => p.contractId === contractId);
-  if (found) return found;
-  // The accountability money trail links to projects DPWH titles with short
-  // spellings of the city ("SJDMB", "SN JOSE DEL MONTE"), which the list above
-  // does not include. Look there before giving up. Cached, so lookups that miss
-  // (including made-up ids) do not each fire fresh searches.
-  const wider = await getAppropriationProjectsCached().catch(() => []);
-  return wider.find((p) => p.contractId === contractId) ?? null;
+  return projects.find((p) => p.contractId === contractId) ?? null;
 }
-
-const getAppropriationProjectsCached = unstable_cache(
-  fetchAppropriationProjects,
-  ["appropriation-projects"],
-  { revalidate: 3600 }
-);

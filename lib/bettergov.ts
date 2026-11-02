@@ -1,5 +1,6 @@
 import type { DpwhProject, BudgetYear } from "./types";
 import { categorizeTitle } from "./categorize";
+import { isSjdmTitle } from "./match-appropriations";
 
 const MEILISEARCH_URL = "https://search2.bettergov.ph/indexes";
 
@@ -99,48 +100,27 @@ function normalizeDpwhHit(hit: Record<string, unknown>): DpwhProject {
   };
 }
 
-export async function fetchLiveDpwhProjects(): Promise<DpwhProject[]> {
-  // Meilisearch hard cap is 10 000 hits total. Fetch two pages of 500 sorted
-  // by most-recent infra year so callers always see the newest projects first.
-  const pages = await Promise.all([
-    meilisearchPost("dpwh", {
-      q: "San Jose del Monte",
-      limit: 500,
-      offset: 0,
-      sort: ["infraYear:desc"],
-      attributesToRetrieve: ["*"],
-    }).catch(() =>
-      meilisearchPost("dpwh", {
-        q: "San Jose del Monte",
-        limit: 500,
-        offset: 0,
-        attributesToRetrieve: ["*"],
-      })
-    ),
-    meilisearchPost("dpwh", {
-      q: "San Jose del Monte",
-      limit: 500,
-      offset: 500,
-      sort: ["infraYear:desc"],
-      attributesToRetrieve: ["*"],
-    }).catch(() =>
-      meilisearchPost("dpwh", {
-        q: "San Jose del Monte",
-        limit: 500,
-        offset: 500,
-        attributesToRetrieve: ["*"],
-      })
-    ),
-  ]);
+/** DPWH abbreviates the city; each query catches spellings the others miss. */
+const DPWH_SJDM_QUERIES = ["San Jose del Monte", "SJDM", "Sn Jose del Monte"];
 
-  const hits = [...(pages[0].hits ?? []), ...(pages[1].hits ?? [])];
-  return hits
-    .filter((h) =>
-      str(h.PROJECT_DESCRIPTION ?? h.description ?? h.DESCRIPTION ?? "")
-        .toLowerCase()
-        .includes("san jose del monte")
-    )
-    .map(normalizeDpwhHit);
+/** SJDM projects from several searches: de-duplicated, newest infra year first. */
+export function pickSjdmProjects(results: DpwhProject[][]): DpwhProject[] {
+  const byId = new Map<string, DpwhProject>();
+  for (const p of results.flat()) {
+    if (p.contractId && isSjdmTitle(p.description) && !byId.has(p.contractId)) byId.set(p.contractId, p);
+  }
+  return [...byId.values()].sort((a, b) => b.infraYear.localeCompare(a.infraYear));
+}
+
+/**
+ * Every DPWH project whose title names SJDM in any spelling ("SJDMB",
+ * "SN JOSE DEL MONTE" included). Each search returns its whole result set or
+ * throws, so callers get the full list or an error (and fall back to Neon),
+ * never a silently cut list.
+ */
+export async function fetchLiveDpwhProjects(): Promise<DpwhProject[]> {
+  const results = await Promise.all(DPWH_SJDM_QUERIES.map((q) => searchDpwhProjects(q)));
+  return pickSjdmProjects(results);
 }
 
 /**

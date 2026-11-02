@@ -1,4 +1,4 @@
-import { searchDpwhProjects } from "./bettergov";
+import { fetchLiveDpwhProjects } from "./bettergov";
 import { categorizeTitle } from "./categorize";
 import {
   isSjdmTitle,
@@ -20,8 +20,6 @@ import type { DpwhProject } from "./types";
 
 const BUDGET_API = "https://budget.bettergov.ph";
 const PLACE_QUERY = "San Jose del Monte";
-/** DPWH abbreviates the city; each query catches spellings the others miss. */
-const DPWH_QUERIES = ["San Jose del Monte", "SJDM", "Sn Jose del Monte"];
 const GAA_PAGE_SIZE = 200;
 const MAX_GAA_PAGES = 20;
 const DAY = 86_400;
@@ -74,16 +72,6 @@ export async function fetchGaaDpwhLines(): Promise<GaaLine[]> {
     );
 }
 
-/** DPWH projects whose title names SJDM in any spelling, de-duplicated. */
-export async function fetchAppropriationProjects(): Promise<DpwhProject[]> {
-  const results = await Promise.all(DPWH_QUERIES.map((q) => searchDpwhProjects(q)));
-  const byId = new Map<string, DpwhProject>();
-  for (const p of results.flat()) {
-    if (p.contractId && isSjdmTitle(p.description) && !byId.has(p.contractId)) byId.set(p.contractId, p);
-  }
-  return [...byId.values()];
-}
-
 export type YearTrail = {
   year: number;
   lines: number;
@@ -130,7 +118,7 @@ export function summarizeYears(matches: AppropriationMatch[]): YearTrail[] {
 }
 
 export async function getMoneyTrail(): Promise<MoneyTrail> {
-  const [lines, projects] = await Promise.all([fetchGaaDpwhLines(), fetchAppropriationProjects()]);
+  const [lines, projects] = await Promise.all([fetchGaaDpwhLines(), fetchLiveDpwhProjects()]);
   const matches = matchAppropriations(lines, projects);
   return { matches, years: summarizeYears(matches) };
 }
