@@ -9,7 +9,9 @@ import type { DpwhProject } from "./types";
  * abbreviate ("CONST.", "RD.") and spell Doña several ways. So a line matches
  * a project when nearly all of the line's title words appear in the project's
  * title, within the same funding year, the contract is 50–105% of the
- * appropriation, and each project is used once.
+ * appropriation, and each project is used once. A second pass matches the
+ * remaining lines to the parts of contracts that bundle several works, when
+ * those lines' appropriations add up to the bundle's contract.
  *
  * A match is a lead with a stated confidence, not proof that the project is
  * the line. Unmatched lines mean "no matching DPWH record found", nothing more.
@@ -29,9 +31,11 @@ export type Confidence = "high" | "medium";
 export type AppropriationMatch = {
   line: GaaLine;
   project: DpwhProject | null;
-  /** Share of the line's title words found in the project's title, 0–1. */
+  /** Share of the line's title words found in the project's title (or bundle part), 0–1. */
   score: number;
   confidence: Confidence | null;
+  /** True when the project is one contract covering several budget lines. */
+  bundled: boolean;
 };
 
 const HIGH = 0.9;
@@ -81,7 +85,7 @@ const STOPWORDS = new Set([
   "of", "at", "to", "the", "and", "or", "with", "in", "on", "for", "along",
   "including", "incl", "a", "an",
   // Place words: every line in this portal is in SJDM, so they carry no signal.
-  "city", "province", "barangay", "brgy",
+  "city", "province", "prov", "barangay", "brgy", "sjdm", "sjdmb",
   // Doña, as the sources spell it: "Doña", "Dona", "Donia", and "Do±a" (→ "do a").
   "dona", "donia", "do",
 ]);
@@ -98,6 +102,7 @@ function normalizeTitle(title: string): string {
     .normalize("NFD")
     .replace(/[̀-ͯ]/g, "")
     .replace(/multi\s*-?\s*purpose/g, "multipurpose")
+    .replace(/\bmpb\b/g, "multipurpose building")
     .replace(/by\s*-\s*pass/g, "bypass")
     .replace(/\(\s*p\s*(\d+)\s*\)/g, " phase $1 ");
 }
@@ -137,6 +142,20 @@ export function fundingYear(p: DpwhProject): number | null {
   if (fromSource) return Number(fromSource);
   if (/^\d{4}$/.test(p.infraYear) && !p.sourceOfFunds) return Number(p.infraYear);
   return null;
+}
+
+/**
+ * The works a bundled contract lists, or [] when it lists one. DPWH writes
+ * bundles as numbered lists ("1.MPB BRGY. BAGONG BUHAY 1, 2. MPB BRGY. …") or
+ * as repeated work clauses ("…, CONST. OF RD. …, CONST. OF RDS. …"). The first
+ * part is usually the program name.
+ */
+export function bundleParts(description: string): string[] {
+  const parts = normalizeTitle(description)
+    .split(/\s\d{1,2}\s*\.\s*(?=[a-z])|,\s*(?=(?:const|construction|rehab|rehabilitation|improvement|multipurpose)\b)/)
+    .map((p) => p.trim())
+    .filter(Boolean);
+  return parts.length >= 2 ? parts : [];
 }
 
 function overlap(a: Set<string>, b: Set<string>): number {
@@ -180,14 +199,79 @@ export function matchAppropriations(lines: GaaLine[], projects: DpwhProject[]): 
     usedProjects.add(c.pi);
   }
 
+  const bundled = matchBundles(lines, projects, projectYears, byLine, usedProjects);
+
   return lines.map((line, li) => {
     const c = byLine.get(li);
-    if (!c) return { line, project: null, score: 0, confidence: null };
-    return {
-      line,
-      project: projects[c.pi],
-      score: c.score,
-      confidence: c.score >= HIGH ? "high" : "medium",
-    };
+    if (c) {
+      return { line, project: projects[c.pi], score: c.score, confidence: c.score >= HIGH ? "high" : "medium", bundled: false };
+    }
+    const b = bundled.get(li);
+    if (b) return { line, project: projects[b.pi], score: b.score, confidence: "medium", bundled: true };
+    return { line, project: null, score: 0, confidence: null, bundled: false };
   });
+}
+
+/** Words every work title starts with; inside a bundle the verb is often stated once for all parts. */
+const ACTION_WORDS = new Set(["construction", "rehabilitation", "improvement", "completion", "upgrading", "repair"]);
+const MIN_BUNDLE_TOKENS = 2;
+
+type PartCandidate = { li: number; pi: number; part: number; score: number; jaccard: number };
+
+/**
+ * Second pass for lines the one-to-one pass left unmatched: match each to one
+ * part of an unused bundled contract from the same year. A bundle is kept only
+ * when its matched lines' appropriations add up to its contract amount.
+ */
+function matchBundles(
+  lines: GaaLine[],
+  projects: DpwhProject[],
+  projectYears: (number | null)[],
+  matchedLines: Map<number, Candidate>,
+  usedProjects: Set<number>
+): Map<number, { pi: number; score: number }> {
+  const bundles = projects.flatMap((p, pi) => {
+    if (usedProjects.has(pi)) return [];
+    const parts = bundleParts(p.description);
+    if (!parts.length) return [];
+    return [{ pi, parts: parts.map((text) => ({ tokens: titleTokens(text), phase: phaseOf(text) })) }];
+  });
+  if (!bundles.length) return new Map();
+
+  const candidates: PartCandidate[] = [];
+  lines.forEach((line, li) => {
+    if (matchedLines.has(li)) return;
+    const lt = new Set([...titleTokens(line.name)].filter((t) => !ACTION_WORDS.has(t)));
+    if (lt.size < MIN_BUNDLE_TOKENS) return;
+    const linePhase = phaseOf(line.name);
+    for (const { pi, parts } of bundles) {
+      if (projectYears[pi] !== line.year) continue;
+      parts.forEach((part, k) => {
+        if (linePhase && part.phase && linePhase !== part.phase) return;
+        const shared = overlap(lt, part.tokens);
+        const score = shared / lt.size;
+        if (score < MEDIUM) return;
+        candidates.push({ li, pi, part: k, score, jaccard: shared / (lt.size + part.tokens.size - shared) });
+      });
+    }
+  });
+
+  // Best first; each line and each part of a bundle is used at most once.
+  candidates.sort((a, b) => b.score - a.score || b.jaccard - a.jaccard);
+  const byLine = new Map<number, { pi: number; score: number }>();
+  const usedParts = new Set<string>();
+  for (const c of candidates) {
+    const partKey = `${c.pi}:${c.part}`;
+    if (byLine.has(c.li) || usedParts.has(partKey)) continue;
+    byLine.set(c.li, { pi: c.pi, score: c.score });
+    usedParts.add(partKey);
+  }
+
+  // The lines a bundle took must add up to its contract, or none of them stand.
+  const totals = new Map<number, number>();
+  for (const [li, { pi }] of byLine) totals.set(pi, (totals.get(pi) ?? 0) + lines[li].amount);
+  for (const [li, { pi }] of byLine) {
+    if (!amountsAgree(totals.get(pi)!, projects[pi].budget)) byLine.delete(li);
+  }
+  return byLine;
 }

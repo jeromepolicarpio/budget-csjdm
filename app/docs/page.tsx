@@ -399,7 +399,10 @@ export default function DocsPage() {
                 DPWH abbreviations (&ldquo;CONST.&rdquo;, &ldquo;RD.&rdquo;) and ignoring place words.
                 Titles that name different phases never match, and the contract must be 50–105% of the
                 appropriation (contracts are awarded at or below it; outside that range a title match
-                was always the wrong project). Each project is used once, best match first. Matches at 90% or more are shown as matched; 75–90% as probable.
+                was always the wrong project). Each project is used once, best match first. Some
+                contracts bundle several works (&ldquo;1. MPB Brgy. Bagong Buhay 1, 2. MPB Brgy.
+                Gumaoc East, …&rdquo;); lines still unmatched are then matched to one part each of such a
+                contract, and kept only when their appropriations add up to the contract amount. Matches at 90% or more are shown as matched; 75–90% as probable.
               </p>
               <p>
                 <span className="font-medium text-foreground">What it does not show.</span> An

@@ -76,9 +76,14 @@ export type YearTrail = {
   year: number;
   lines: number;
   enacted: number;
+  /** Budget lines with a DPWH project. */
   matched: number;
   mediumConfidence: number;
+  /** Of the matched lines, those carried out under a contract that bundles several lines. */
+  bundled: number;
+  /** Sum of distinct contracts: a bundled contract counts once. */
   contracted: number;
+  /** Budget lines whose DPWH project is reported completed / on-going. */
   completed: number;
   ongoing: number;
   /** False while DPWH has published no project for this year's funds yet. */
@@ -98,6 +103,11 @@ export function isOngoing(p: DpwhProject): boolean {
   return /^on-?going$/i.test(p.status.trim());
 }
 
+/** One entry per contract, however many lines it carries. */
+function distinctProjects(projects: DpwhProject[]): DpwhProject[] {
+  return [...new Map(projects.map((p) => [p.contractId, p])).values()];
+}
+
 export function summarizeYears(matches: AppropriationMatch[]): YearTrail[] {
   const years = [...new Set(matches.map((m) => m.line.year))].sort((a, b) => a - b);
   return years.map((year) => {
@@ -108,8 +118,9 @@ export function summarizeYears(matches: AppropriationMatch[]): YearTrail[] {
       lines: inYear.length,
       enacted: inYear.reduce((s, m) => s + m.line.amount, 0),
       matched: projects.length,
-      mediumConfidence: inYear.filter((m) => m.confidence === "medium").length,
-      contracted: projects.reduce((s, p) => s + p.budget, 0),
+      mediumConfidence: inYear.filter((m) => m.confidence === "medium" && !m.bundled).length,
+      bundled: inYear.filter((m) => m.bundled).length,
+      contracted: distinctProjects(projects).reduce((s, p) => s + p.budget, 0),
       completed: projects.filter(isCompleted).length,
       ongoing: projects.filter(isOngoing).length,
       published: projects.length > 0,
@@ -128,24 +139,33 @@ export async function getMoneyTrail(): Promise<MoneyTrail> {
 export type TrailSlice = {
   matches: AppropriationMatch[];
   enacted: number;
+  /** Sum of distinct contracts. */
   contracted: number;
+  /** Budget lines with a DPWH project. */
   matched: number;
+  /** Budget lines whose project is reported completed / on-going. */
   completed: number;
   ongoing: number;
+  /** Distinct DPWH contracts, and how many of them are reported completed. */
+  contracts: number;
+  completedContracts: number;
   firstYear: number;
   lastYear: number;
 };
 
 export function slice(matches: AppropriationMatch[]): TrailSlice {
   const projects = matches.flatMap((m) => (m.project ? [m.project] : []));
+  const contracts = distinctProjects(projects);
   const years = matches.map((m) => m.line.year);
   return {
     matches,
     enacted: matches.reduce((s, m) => s + m.line.amount, 0),
-    contracted: projects.reduce((s, p) => s + p.budget, 0),
+    contracted: contracts.reduce((s, p) => s + p.budget, 0),
     matched: projects.length,
     completed: projects.filter(isCompleted).length,
     ongoing: projects.filter(isOngoing).length,
+    contracts: contracts.length,
+    completedContracts: contracts.filter(isCompleted).length,
     firstYear: years.length ? Math.min(...years) : 0,
     lastYear: years.length ? Math.max(...years) : 0,
   };

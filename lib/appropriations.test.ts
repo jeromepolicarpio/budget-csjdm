@@ -12,8 +12,8 @@ function project(contractId: string, budget: number, status: string): DpwhProjec
   };
 }
 
-function m(name: string, year: number, amount: number, p: DpwhProject | null, confidence: "high" | "medium" | null = p ? "high" : null): AppropriationMatch {
-  return { line: { key: name, name, year, amount }, project: p, score: p ? 1 : 0, confidence };
+function m(name: string, year: number, amount: number, p: DpwhProject | null, confidence: "high" | "medium" | null = p ? "high" : null, bundled = false): AppropriationMatch {
+  return { line: { key: name, name, year, amount }, project: p, score: p ? 1 : 0, confidence, bundled };
 }
 
 const matches: AppropriationMatch[] = [
@@ -56,6 +56,22 @@ test("bypassLines collects every Doña Remedios Trinidad phase in year order", (
   assert.equal(bypass.contracted, 472);
   assert.equal(bypass.firstYear, 2021);
   assert.equal(bypass.lastYear, 2024);
+});
+
+test("a bundled contract is counted once in contract totals", () => {
+  const bundle = project("BUNDLE", 59, "Completed");
+  const bundled = [
+    m("Construction of Multi-Purpose Building, Barangay Muzon", 2023, 30, bundle, "medium", true),
+    m("Construction of Multi-Purpose Building, Barangay Citrus", 2023, 30, bundle, "medium", true),
+  ];
+  const [y] = summarizeYears(bundled);
+  assert.equal(y.matched, 2);
+  assert.equal(y.bundled, 2);
+  assert.equal(y.contracted, 59);
+  const s = slice(bundled);
+  assert.equal(s.contracted, 59);
+  assert.equal(s.contracts, 1);
+  assert.equal(s.completedContracts, 1);
 });
 
 test("slice of nothing is all zeros", () => {

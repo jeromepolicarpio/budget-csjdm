@@ -13,6 +13,7 @@ export function MoneyTrailSection({ trail }: { trail: MoneyTrail }) {
   const unmatched = trail.matches.filter((m) => !m.project && published.has(m.line.year));
   const unmatchedTotal = unmatched.reduce((s, m) => s + m.line.amount, 0);
   const medium = trail.years.reduce((s, y) => s + y.mediumConfidence, 0);
+  const bundled = trail.years.reduce((s, y) => s + y.bundled, 0);
 
   return (
     <section aria-labelledby="money-trail" className="mb-10">
@@ -62,8 +63,15 @@ export function MoneyTrailSection({ trail }: { trail: MoneyTrail }) {
                   <>
                     <td className="px-4 py-3 whitespace-nowrap">
                       {y.matched} of {y.lines}
-                      {y.mediumConfidence > 0 && (
-                        <span className="text-xs text-muted-foreground ml-1">({y.mediumConfidence} probable)</span>
+                      {(y.mediumConfidence > 0 || y.bundled > 0) && (
+                        <span className="text-xs text-muted-foreground ml-1">
+                          ({[
+                            y.mediumConfidence > 0 && `${y.mediumConfidence} probable`,
+                            y.bundled > 0 && `${y.bundled} in a bundled contract`,
+                          ]
+                            .filter(Boolean)
+                            .join(", ")})
+                        </span>
                       )}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">{formatPeso(y.contracted)}</td>
@@ -88,6 +96,14 @@ export function MoneyTrailSection({ trail }: { trail: MoneyTrail }) {
           A match pairs a budget line with a DPWH project funded the same year whose title contains nearly all of the line&apos;s words and whose contract is 50–105% of the appropriation.
           {medium > 0 && ` ${medium} ${medium === 1 ? "match is" : "matches are"} marked probable: most but not all words agree.`}
         </li>
+        {bundled > 0 && (
+          <li>
+            Some DPWH contracts list several works at once. {bundled} budget{" "}
+            {bundled === 1 ? "line is" : "lines are"} matched to one part of such a contract, kept only when
+            the lines&apos; appropriations add up to the contract. Contract totals count each contract once;
+            the Completed and On-going columns count budget lines.
+          </li>
+        )}
         <li>The bypass road to Doña Remedios Trinidad runs between the two towns; its amounts are not all spent inside SJDM.</li>
       </ul>
 

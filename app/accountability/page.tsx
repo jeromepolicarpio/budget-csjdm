@@ -182,7 +182,7 @@ export default async function AccountabilityPage() {
       ? [
           {
             type: "warn" as const,
-            title: `DRT–SJDM Bypass Road: ${formatPeso(bypass.enacted)} Appropriated; DPWH Reports ${bypass.completed} of ${bypass.matched} Contracts Complete`,
+            title: `DRT–SJDM Bypass Road: ${formatPeso(bypass.enacted)} Appropriated; DPWH Reports ${bypass.completedContracts} of ${bypass.contracts} Contracts Complete`,
             detail: `Since ${bypass.firstYear}, Congress has appropriated ${formatPeso(bypass.enacted)} across ${bypass.matches.length} budget lines for the bypass road from Doña Remedios Trinidad to San Jose del Monte, most of them numbered phases. DPWH has project records for ${bypass.matched} of those lines, with contracts worth ${formatPeso(bypass.contracted)}; it reports ${bypass.completed} complete and ${bypass.ongoing} still on-going.${bypassStalled.length > 0 ? ` Of the ${bypassOld.length} funded two or more years ago and still on-going, ${bypassStalled.length} are under half done by DPWH's own count: ${bypassStalled.join("; ")}.` : ""} The road runs between the two towns, so not all of this money is spent inside SJDM.`,
             sources: [
               NATIONAL_BUDGET_SOURCE,

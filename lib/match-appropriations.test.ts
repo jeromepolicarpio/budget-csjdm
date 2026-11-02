@@ -4,6 +4,7 @@ import {
   titleTokens,
   phaseOf,
   isSjdmTitle,
+  bundleParts,
   fundingYear,
   matchAppropriations,
   type GaaLine,
@@ -155,6 +156,51 @@ test("phaseOf reads hyphenated, abbreviated and lettered phases", () => {
   assert.equal(phaseOf("CONST. OF ROAD PH. 3"), "3");
   assert.equal(phaseOf("Construction of Road, Phase 1-A"), "1");
   assert.equal(phaseOf("Multi-purpose building, Phase IV"), "4");
+});
+
+const BUNDLE_23C00120 =
+  "CONVERGENCE & SPL. SUPPORT PROG.-BASIC INFRA. PROG. 1.MPB BRGY. BAGONG BUHAY 1, 2. MPB BRGY. GUMAOC EAST. 3. MPB CITY COLLEGE BRGY. MINUYAN I, 4. MPB BRGY. MUZON, 5. MPB BRGY. SAN MARTIN, 6. MPB BRGY. CITRUS, 7. MPB BRGY. MINUYAN 1, SJDM, PROV. OF BULACAN";
+
+test("bundleParts splits numbered lists and repeated work clauses", () => {
+  assert.equal(bundleParts(BUNDLE_23C00120).length, 8); // program head + 7 buildings
+  assert.ok(
+    bundleParts(
+      "CONST. OF RD. BRGY. PULONG AT BRGR. YANTOC, ANGAT, CONST. OF RD. W/DRAINAGE CANAL BRGY. STA. CRUZ II, SJDM, CONST. OF RDS. BRGY."
+    ).length >= 3
+  );
+  assert.deepEqual(bundleParts("CONSTRUCTION OF DIKE ALONG SANTO CRISTO RIVER, BARANGAY KAYPIAN, SAN JOSE DEL MONTE CITY"), []);
+});
+
+test("matches leftover lines to the parts of one bundled contract", () => {
+  // Real 2023 case: seven barangay buildings (₱60M) under one ₱59.4M contract.
+  const names: [string, number][] = [
+    ["Construction of Multi-Purpose Building, Barangay Bagong Buhay 1, San Jose Del Monte City, Bulacan", 10_000_000],
+    ["Construction of Multi-Purpose Building, Barangay Gumaoc East, San Jose Del Monte City, Bulacan", 5_000_000],
+    ["Construction of Multi-Purpose Building, City College of San Jose del Monte, Barangay Minuyan I, City of San Jose del Monte, Bulacan", 20_000_000],
+    ["Construction of Multi-Purpose Building, Barangay Muzon, San Jose Del Monte City, Bulacan", 5_000_000],
+    ["Construction of Multi-Purpose Building, Barangay San Martin IV, San Jose Del Monte City, Bulacan", 10_000_000],
+    ["Construction of Multi-Purpose Building, Brgy. Citrus, San Jose Del Monte City, Bulacan", 5_000_000],
+    ["Construction of Multi-Purpose Building, Barangay Minuyan I, San Jose Del Monte City, Bulacan", 5_000_000],
+  ];
+  const result = matchAppropriations(
+    names.map(([n, a]) => line(n, 2023, a)),
+    [project({ contractId: "23C00120", infraYear: "2023", sourceOfFunds: "Regular Infra - GAA 2023 CSSP", budget: 59_400_000, description: BUNDLE_23C00120 })]
+  );
+  for (const m of result) {
+    assert.equal(m.project?.contractId, "23C00120", m.line.name);
+    assert.equal(m.bundled, true);
+    assert.equal(m.confidence, "medium");
+  }
+});
+
+test("rejects a bundle whose matched lines do not add up to the contract", () => {
+  // Real 2023 case: ₱54.4M contract mostly for roads in Angat; only one ₱10M SJDM line.
+  const [m] = matchAppropriations(
+    [line("Construction of Road with Drainage Canal Barangay Sta. Cruz II, San Jose Del Monte City, Bulacan", 2023, 10_000_000)],
+    [project({ contractId: "23C00213", infraYear: "2023", sourceOfFunds: "Regular Infra - GAA 2023 CSSP", budget: 54_400_000, description: "CONVERGENCE & SPL. SUPPORT PROG.-BIP-ACCESS RDS. &/OR BRS.-CONST. OF RD. BRGY. PULONG AT BRGR. YANTOC, ANGAT, CONST. OF RD. W/DRAINAGE CANAL BRGY. STA. CRUZ II, SJDM, CONST. OF RDS. BRGY." })]
+  );
+  assert.equal(m.project, null);
+  assert.equal(m.bundled, false);
 });
 
 test("never matches a project funded in another year", () => {
