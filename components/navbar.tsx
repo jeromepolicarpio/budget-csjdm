@@ -4,18 +4,59 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Menu, X, Sun, Moon } from "lucide-react";
+import { Menu, X, Sun, Moon, ArrowUpRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { cn } from "@/lib/utils";
 
-const links = [
+type NavItem = { href: string; label: string; external?: boolean };
+
+const NATIONAL_BUDGET_URL = "https://national-budget-csjdm.vercel.app";
+
+const links: NavItem[] = [
   { href: "/", label: "Overview" },
   { href: "/budget", label: "Budget" },
   { href: "/procurement", label: "Procurement" },
   { href: "/projects", label: "Projects" },
   { href: "/accountability", label: "Accountability" },
+  { href: NATIONAL_BUDGET_URL, label: "National Budget", external: true },
   { href: "/docs", label: "Docs" },
 ];
+
+const IDLE = "text-muted-foreground hover:text-foreground hover:bg-muted";
+const ACTIVE = "bg-primary text-primary-foreground font-medium";
+
+function NavLink({ link, active, className, onClick }: {
+  link: NavItem;
+  active: boolean;
+  className: string;
+  onClick?: () => void;
+}) {
+  if (link.external) {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onClick}
+        className={cn(className, "inline-flex items-center gap-1", IDLE)}
+      >
+        {link.label}
+        <ArrowUpRight size={14} aria-hidden="true" />
+        <span className="sr-only">(opens in a new tab)</span>
+      </a>
+    );
+  }
+  return (
+    <Link
+      href={link.href}
+      aria-current={active ? "page" : undefined}
+      onClick={onClick}
+      className={cn(className, active ? ACTIVE : IDLE)}
+    >
+      {link.label}
+    </Link>
+  );
+}
 
 export function Navbar() {
   const pathname = usePathname();
@@ -35,7 +76,7 @@ export function Navbar() {
     <>
     {open && (
       <div
-        className="sm:hidden fixed inset-0 z-40 bg-background/60 backdrop-blur-sm animate-in fade-in duration-150"
+        className="lg:hidden fixed inset-0 z-40 bg-background/60 backdrop-blur-sm animate-in fade-in duration-150"
         onClick={() => setOpen(false)}
         aria-hidden="true"
       />
@@ -58,21 +99,14 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden sm:flex items-center gap-1">
+        <nav className="hidden lg:flex items-center gap-1">
           {links.map((link) => (
-            <Link
+            <NavLink
               key={link.href}
-              href={link.href}
-              aria-current={pathname === link.href ? "page" : undefined}
-              className={cn(
-                "px-3 py-1.5 rounded-md text-sm transition-colors",
-                pathname === link.href
-                  ? "bg-primary text-primary-foreground font-medium"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
-              )}
-            >
-              {link.label}
-            </Link>
+              link={link}
+              active={pathname === link.href}
+              className="px-3 py-1.5 rounded-md text-sm transition-colors"
+            />
           ))}
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
@@ -84,7 +118,7 @@ export function Navbar() {
         </nav>
 
         {/* Mobile controls */}
-        <div className="sm:hidden flex items-center gap-1">
+        <div className="lg:hidden flex items-center gap-1">
           <button
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
@@ -106,23 +140,16 @@ export function Navbar() {
 
       {/* Mobile dropdown */}
       {open && (
-        <div id="mobile-menu" className="sm:hidden border-t bg-background/95 backdrop-blur animate-in fade-in slide-in-from-top-1 duration-150">
+        <div id="mobile-menu" className="lg:hidden border-t bg-background/95 backdrop-blur animate-in fade-in slide-in-from-top-1 duration-150">
           <nav className="max-w-6xl mx-auto px-4 py-3 flex flex-col gap-1">
             {links.map((link) => (
-              <Link
+              <NavLink
                 key={link.href}
-                href={link.href}
-                aria-current={pathname === link.href ? "page" : undefined}
+                link={link}
+                active={pathname === link.href}
                 onClick={() => setOpen(false)}
-                className={cn(
-                  "px-3 py-2.5 rounded-md text-sm transition-colors",
-                  pathname === link.href
-                    ? "bg-primary text-primary-foreground font-medium"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {link.label}
-              </Link>
+                className="px-3 py-2.5 rounded-md text-sm transition-colors"
+              />
             ))}
           </nav>
         </div>
